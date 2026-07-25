@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初一基础电脑科学 (ASK) 核心讲义与复习题库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- MathJax for rendering LaTeX formulas -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f1f5f9; }
+        .tab-btn.active { background-color: #4f46e5; color: white; font-weight: bold; border-color: #4f46e5; }
+        .chapter-card { transition: all 0.2s ease-in-out; }
+        .chapter-card:hover { transform: translateY(-2px); }
+        .code-block { font-family: 'Fira Code', 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 p-2 rounded-lg font-bold text-xl">ASK T1</div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold">Asas Sains Komputer (ASK) Tingkatan 1</h1>
+                    <p class="text-xs text-indigo-200">KSSM 初一基础电脑科学 · 单元1至4复习讲义与综合题库</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="flex flex-wrap gap-2">
+                <button onclick="switchTab('notes')" id="btn-notes" class="tab-btn active px-4 py-2 rounded-lg text-sm transition border border-indigo-700 bg-indigo-800 hover:bg-indigo-700">
+                    📖 核心讲义 (Notes)
+                </button>
+                <button onclick="switchTab('quiz')" id="btn-quiz" class="tab-btn px-4 py-2 rounded-lg text-sm transition border border-indigo-700 bg-indigo-800 hover:bg-indigo-700">
+                    📝 章节题库 (Questions)
+                </button>
+                <button onclick="switchTab('tools')" id="btn-tools" class="tab-btn px-4 py-2 rounded-lg text-sm transition border border-indigo-700 bg-indigo-800 hover:bg-indigo-700">
+                    🧮 计算与辅助工具 (Tools)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- TAB 1: 核心讲义 (NOTES) -->
+        <div id="tab-notes" class="space-y-10">
+
+            <!-- Chapter 1 -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-indigo-700 px-6 py-4 text-white flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Bab 1: Konsep Asas Pemikiran Komputasional (计算思维基础)</h2>
+                    <span class="bg-indigo-800 text-xs px-3 py-1 rounded-full border border-indigo-500">单元 1</span>
+                </div>
+                <div class="p-6 space-y-6">
+                    <p class="text-slate-600 leading-relaxed">
+                        <strong>Pemikiran Komputasional (计算思维)</strong> 是借助计算机科学基础概念解决问题的思维过程。它并非像计算机一样思考，而是人类借助逻辑分析将复杂的现实问题拆解并转化为可解决模型的步骤。
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                            <h3 class="font-bold text-indigo-900 mb-2 flex items-center">
+                                <span class="w-6 h-6 bg-indigo-600 text-white rounded-full inline-flex justify-center items-center text-xs mr-2">1</span>
+                                拆解法 (Teknik Leraian / Decomposition)
+                            </h3>
+                            <p class="text-sm text-slate-700">将复杂的的大问题拆解成若干个较小、较易管理的子问题 (Bahagian-bahagian kecil)。例如：将建造房屋拆分为地基、墙体、屋顶等步骤。</p>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <h3 class="font-bold text-blue-900 mb-2 flex items-center">
+                                <span class="w-6 h-6 bg-blue-600 text-white rounded-full inline-flex justify-center items-center text-xs mr-2">2</span>
+                                模式识别 (Teknik Pengecaman Corak / Pattern Recognition)
+                            </h3>
+                            <p class="text-sm text-slate-700">寻找不同问题或子问题之间的相似之处 (Kesamaan) 和差异 (Perbezaan)，从而利用过往经验快速找到规律。</p>
+                        </div>
+
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                            <h3 class="font-bold text-amber-900 mb-2 flex items-center">
+                                <span class="w-6 h-6 bg-amber-600 text-white rounded-full inline-flex justify-center items-center text-xs mr-2">3</span>
+                                抽象化 (Teknik Peniskalaan / Abstraction)
+                            </h3>
+                            <p class="text-sm text-slate-700">专注于解决问题所需的**关键要素 (Aspek Penting)**，忽略无关紧要的次要细节 (Aspek Kurang Penting)。例如：导航地图只保留道路与结点，忽略建筑物外墙颜色。</p>
+                        </div>
+
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                            <h3 class="font-bold text-emerald-900 mb-2 flex items-center">
+                                <span class="w-6 h-6 bg-emerald-600 text-white rounded-full inline-flex justify-center items-center text-xs mr-2">4</span>
+                                概括法 (Teknik Pengitlakan / Generalisation)
+                            </h3>
+                            <p class="text-sm text-slate-700">构建通用模型 (Model)、数学公式 (Formula) 或算法流程 (Algoritma)，用于解决具有相同特征的同类问题。</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="font-semibold text-slate-800 mb-2">💡 考点强调：问题解决决策 (Penentuan Aspek Penting)</h4>
+                        <p class="text-sm text-slate-600">在寻求最佳路径（如邮递员路线规划）或资源分配（如行李箱装载）时，需根据**限制条件 (Halangan/Syarat)** 找出最优化路径。核心步骤包括按权重排序、排除非法状态、迭代选出最佳解。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-blue-700 px-6 py-4 text-white flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Bab 2: Perwakilan Data (数据表示)</h2>
+                    <span class="bg-blue-800 text-xs px-3 py-1 rounded-full border border-blue-500">单元 2</span>
+                </div>
+                <div class="p-6 space-y-6">
+
+                    <!-- Sub 2.1 -->
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-900 mb-3 border-b pb-2">2.1 二进制系统 (Sistem Nombor Perduaan)</h3>
+                        <div class="space-y-4 text-sm text-slate-700">
+                            <p>计算机内部使用晶体管的开与关状态，分别用数字 $1$（On）与 $0$（Off）表示。这种进制被称为**二进制系统（Sistem Asas 2）**；而人类日常使用的是**十进制系统（Sistem Asas 10）**。</p>
+
+                            <!-- Conversions -->
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <h4 class="font-bold text-slate-800 mb-2">1. 二进制转十进制 (Perduaan $\rightarrow$ Perpuluhan)</h4>
+                                    <p class="mb-2">乘以对应权值 $2^n$ 并累加：</p>
+                                    <p class="text-xs bg-white p-2 rounded border code-block">
+                                        例：将 $1011_2$ 转化为十进制<br>
+                                        $= (1 \times 2^3) + (0 \times 2^2) + (1 \times 2^1) + (1 \times 2^0)$<br>
+                                        $= 8 + 0 + 2 + 1 = 11_{10}$
+                                    </p>
+                                </div>
+
+                                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <h4 class="font-bold text-slate-800 mb-2">2. 十进制转二进制 (Perpuluhan $\rightarrow$ Perduaan)</h4>
+                                    <p class="mb-2">常用方法：除以2取余数法 (Kaedah Bahagi dengan 2 dan gunakan bakinya)。由下往上逆向读取余数。</p>
+                                    <p class="text-xs bg-white p-2 rounded border code-block">
+                                        例：将 $25_{10}$ 转化为二进制<br>
+                                        $25 \div 2 = 12 \text{ 余 } 1$<br>
+                                        $12 \div 2 = 6 \text{ 余 } 0$<br>
+                                        $6 \div 2 = 3 \text{ 余 } 0$<br>
+                                        $3 \div 2 = 1 \text{ 余 } 1$<br>
+                                        $1 \div 2 = 0 \text{ 余 } 1$<br>
+                                        结果：$11001_2$
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Operations -->
+                            <div class="grid md:grid-cols-2 gap-4 mt-4">
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <h4 class="font-bold text-blue-900 mb-2">二进制加法规则 (Penambahan Perduaan)</h4>
+                                    <ul class="list-disc ml-5 space-y-1 text-xs">
+                                        <li>$0 + 0 = 0$</li>
+                                        <li>$0 + 1 = 1$</li>
+                                        <li>$1 + 0 = 1$</li>
+                                        <li>$1 + 1 = 10_2$ （写0进1）</li>
+                                        <li>$10 + 1 = 11_2$ / $1 + 1 + 1 = 11_2$ （写1进1）</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <h4 class="font-bold text-blue-900 mb-2">二进制减法规则 (Penolakan Perduaan)</h4>
+                                    <ul class="list-disc ml-5 space-y-1 text-xs">
+                                        <li>$0 - 0 = 0$</li>
+                                        <li>$1 - 0 = 1$</li>
+                                        <li>$1 - 1 = 0$</li>
+                                        <li>$10_2 - 1 = 1$ （向高位借1位当作 $2$）</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- ASCII -->
+                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                                <h4 class="font-bold text-amber-900 mb-1">ASCII 编码 (Kod Pengekodan ASCII)</h4>
+                                <p class="text-xs text-slate-700 mb-2">American Standard Code for Information Interchange，包含 $128$ 个标准字符。每个字符由 $8$ 位二进制（1 Byte）表示。</p>
+                                <div class="text-xs bg-white p-3 rounded border space-y-1">
+                                    <p>• 字符 'A' 的 ASCII 码是 $01000001_2 = 65_{10}$</p>
+                                    <p>• 字符 'a' 的 ASCII 码是 $01100001_2 = 97_{10}$</p>
+                                    <p>• 字符 '0' 的 ASCII 码是 $00110000_2 = 48_{10}$</p>
+                                    <p class="text-indigo-600 font-semibold mt-1">计算推导规律：字符 'B' = 'A' + $1_2$ ($01000001_2 + 1_2 = 01000010_2 = 66_{10}$)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sub 2.2 -->
+                    <div>
+                        <h3 class="text-lg font-bold text-blue-900 mb-3 border-b pb-2">2.2 数据计量 (Ukuran Data)</h3>
+                        <div class="space-y-4 text-sm text-slate-700">
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <!-- Image Attributes -->
+                                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <h4 class="font-bold text-slate-800 mb-2">1. 图像属性 (Atribut Imej Digital)</h4>
+                                    <ul class="space-y-2 text-xs">
+                                        <li><strong>像素 (Piksel):</strong> 组成图像的最小点单位。</li>
+                                        <li><strong>分辨率 (Resolusi):</strong> 每英寸的点数（dpi）或像素尺寸（如 $1920 \times 1080$）。分辨率越高，图像越清晰，文件体积越大。</li>
+                                        <li><strong>色彩深度 (Kedalaman Warna / Bit Depth):</strong> 表示每个像素颜色所需的 Bit 数。$n$ 位色彩深度可表示 $2^n$ 种颜色。</li>
+                                        <li class="pt-1 text-slate-500">常见格式：BMP（无压缩，体积大）、JPEG（压缩率高，适合照片）、PNG/GIF（支持透明度/简单动画）、TIFF（高质量）。</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Audio Attributes -->
+                                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                    <h4 class="font-bold text-slate-800 mb-2">2. 音频属性 (Atribut Audio Digital)</h4>
+                                    <ul class="space-y-2 text-xs">
+                                        <li><strong>采样率 (Kadar Sampel):</strong> 每秒对声音信号抽样的次数，单位为赫兹（Hz 或 kHz）。采样率越高，音质越逼真。</li>
+                                        <li><strong>比特深度 (Kedalaman Bit Audio):</strong> 记录每个声音采样点数据所需的 Bit 数。</li>
+                                        <li class="pt-1 text-slate-500">常见格式：WAVE (*.wav，无损高保真，体积大）、MP3 (*.mp3，有损高压缩）、MIDI (*.mid，仅存储乐谱指令，体积极小）。</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Data Conversion Table -->
+                            <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                                <h4 class="font-bold text-indigo-900 mb-2">数据计量单位转换 (Pertukaran Unit Ukuran Data)</h4>
+                                <p class="text-xs mb-3 text-slate-600">二进制计算换算关系 ($1 \text{ Byte} = 8 \text{ bits}$；在标准计算机存储计算中，进率通常为 $1024 = 2^{10}$)：</p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left bg-white rounded border">
+                                        <thead class="bg-indigo-100 text-indigo-900 border-b">
+                                            <tr>
+                                                <th class="p-2">单位 (Unit)</th>
+                                                <th class="p-2">缩写</th>
+                                                <th class="p-2">换算关系 (Nilai)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y">
+                                            <tr><td class="p-2">Bit</td><td class="p-2">bit</td><td class="p-2">最小二进制数据单位 ($0$ 或 $1$)</td></tr>
+                                            <tr><td class="p-2">Byte (字节)</td><td class="p-2">B</td><td class="p-2">$1 \text{ Byte} = 8 \text{ bits}$</td></tr>
+                                            <tr><td class="p-2">Kilobyte</td><td class="p-2">KB</td><td class="p-2">$1 \text{ KB} = 1024 \text{ Bytes}$</td></tr>
+                                            <tr><td class="p-2">Megabyte</td><td class="p-2">MB</td><td class="p-2">$1 \text{ MB} = 1024 \text{ KB}$</td></tr>
+                                            <tr><td class="p-2">Gigabyte</td><td class="p-2">GB</td><td class="p-2">$1 \text{ GB} = 1024 \text{ MB}$</td></tr>
+                                            <tr><td class="p-2">Terabyte</td><td class="p-2">TB</td><td class="p-2">$1 \text{ TB} = 1024 \text{ GB}$</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-emerald-700 px-6 py-4 text-white flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Bab 3: Algoritma (算法)</h2>
+                    <span class="bg-emerald-800 text-xs px-3 py-1 rounded-full border border-emerald-500">单元 3</span>
+                </div>
+                <div class="p-6 space-y-6">
+                    <p class="text-slate-600 text-sm leading-relaxed">
+                        <strong>算法 (Algoritma)</strong> 是按顺序解决特定问题的一系列明确步骤。算法可以用**伪代码 (Pseudokod)** 或 **流程图 (Carta Alir)** 来表达。
+                    </p>
+
+                    <!-- Flowchart symbols -->
+                    <div>
+                        <h3 class="text-md font-bold text-emerald-900 mb-3">流程图标准几何符号 (Simbol Carta Alir)</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-white border border-emerald-400 rounded-full font-bold text-slate-700">Oval</span>
+                                <div><p class="font-bold">Mula / Tamat</p><p class="text-slate-500">算法开始与结束</p></div>
+                            </div>
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-white border border-emerald-400 rounded skew-x-12 font-bold text-slate-700">Parallelogram</span>
+                                <div><p class="font-bold">Input / Output</p><p class="text-slate-500">数据输入或输出</p></div>
+                            </div>
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-white border border-emerald-400 rounded font-bold text-slate-700">Rectangle</span>
+                                <div><p class="font-bold">Proses</p><p class="text-slate-500">处理或算术运算</p></div>
+                            </div>
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="px-2 py-1 bg-white border border-emerald-400 rotate-45 inline-block font-bold text-slate-700">◇</span>
+                                <div><p class="font-bold">Pilihan (Diamond)</p><p class="text-slate-500">逻辑判断 (Ya/Tidak)</p></div>
+                            </div>
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-white border border-emerald-400 rounded-full font-bold text-slate-700">◯</span>
+                                <div><p class="font-bold">Penyambung</p><p class="text-slate-500">流程图连接点</p></div>
+                            </div>
+                            <div class="p-3 border rounded bg-emerald-50 flex items-center space-x-3">
+                                <span class="font-bold text-emerald-800 text-lg">➔</span>
+                                <div><p class="font-bold">Garis Alir</p><p class="text-slate-500">指示执行方向</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Control structures & errors -->
+                    <div class="grid md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <h4 class="font-bold text-slate-800 text-sm">控制结构 (Struktur Kawalan)</h4>
+                            <p><strong>1. 顺序结构 (Urutan):</strong> 按照自上而下的顺序一步步执行。</p>
+                            <p><strong>2. 选择结构 (Pilihan):</strong>
+                                <br>• 单选择 (IF...THEN)
+                                <br>• 双选择 (IF...THEN...ELSE)
+                                <br>• 多重选择 (Gandaan Pilihan / NESTED IF)
+                            </p>
+                            <p><strong>3. 循环结构 (Ulangan):</strong> 重复执行特定代码，直到条件满足。常见有 WHILE 循环和 FOR 循环。</p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <h4 class="font-bold text-slate-800 text-sm">程序错误类型与检测 (Ralat)</h4>
+                            <p><strong>• Ralat Sintaks (语法错误):</strong> 拼写或符号使用不当导致程序无法运行。</p>
+                            <p><strong>• Ralat Logik (逻辑错误):</strong> 程序能正常运行但输出错误结果（例如公式算错）。</p>
+                            <p><strong>• Ralat Masa Larian (运行时错误):</strong> 运行时因非法操作崩盘（如除以零）。</p>
+                            <p class="pt-1 text-emerald-700 font-semibold">手动手动追踪调试方法：Semakan Meja (Trace Table / Dry Run) 用于追踪变量值改变。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-amber-700 px-6 py-4 text-white flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Bab 4: Kod Arahan (编程指令)</h2>
+                    <span class="bg-amber-800 text-xs px-3 py-1 rounded-full border border-amber-500">单元 4</span>
+                </div>
+                <div class="p-6 space-y-6">
+
+                    <!-- Sub 4.1 -->
+                    <div>
+                        <h3 class="text-lg font-bold text-amber-900 mb-3 border-b pb-2">4.1 Python 编程语言基础</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <h4 class="font-bold text-slate-800 mb-2">数据类型 (Jenis Data)</h4>
+                                <ul class="space-y-1">
+                                    <li><strong>Integer (int):</strong> 整数，如 <code>10</code>, <code>-5</code></li>
+                                    <li><strong>Float (float):</strong> 浮点数/小数，如 <code>3.14</code>, <code>99.5</code></li>
+                                    <li><strong>String (str):</strong> 字符串，引在引号内，如 <code>"ASK T1"</code></li>
+                                    <li><strong>Boolean (bool):</strong> 布尔值，仅有 <code>True</code> 或 <code>False</code></li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <h4 class="font-bold text-slate-800 mb-2">数学运算符 (Operator Matematik)</h4>
+                                <ul class="space-y-1 code-block">
+                                    <li><code>+</code> (加) | <code>-</code> (减) | <code>*</code> (乘) | <code>/</code> (除)</li>
+                                    <li><code>%</code> (Modulus 取余数): <code>7 % 3 = 1</code></li>
+                                    <li><code>//</code> (Floor Division 取整商): <code>7 // 3 = 2</code></li>
+                                    <li><code>**</code> (Pangkat 幂次方): <code>2 ** 3 = 8</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sub 4.2 -->
+                    <div>
+                        <h3 class="text-lg font-bold text-amber-900 mb-3 border-b pb-2">4.2 HTML 网页代码</h3>
+                        <div class="space-y-3 text-xs text-slate-700">
+                            <p>HTML (HyperText Markup Language) 用于构建网页骨架。基本网页结构如下：</p>
+                            <pre class="bg-slate-900 text-amber-300 p-4 rounded-lg code-block overflow-x-auto">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;网页标题&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;主标题&lt;/h1&gt;
+    &lt;p&gt;这是一个段落。&lt;/p&gt;
+    &lt;img src="image.jpg" alt="描述文字"&gt;
+    &lt;a href="https://example.com"&gt;链接文本&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
+                                <div class="p-2 border rounded bg-amber-50"><code>&lt;h1&gt; - &lt;h6&gt;</code><br><span class="text-slate-500">标题 (H1最大)</span></div>
+                                <div class="p-2 border rounded bg-amber-50"><code>&lt;p&gt;</code><br><span class="text-slate-500">段落 (Paragraph)</span></div>
+                                <div class="p-2 border rounded bg-amber-50"><code>&lt;img src="..."&gt;</code><br><span class="text-slate-500">插入图片</span></div>
+                                <div class="p-2 border rounded bg-amber-50"><code>&lt;a href="..."&gt;</code><br><span class="text-slate-500">超链接</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+
+        <!-- TAB 2: 章节题库 (QUIZ) -->
+        <div id="tab-quiz" class="hidden space-y-6">
+
+            <!-- Filter Controls -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-sm text-slate-700">选择复习章节:</span>
+                    <select id="chapter-filter" onchange="filterQuestions()" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="all">全部章节 (Bab 1 - Bab 4)</option>
+                        <option value="1">Bab 1: 计算思维</option>
+                        <option value="2">Bab 2: 数据表示</option>
+                        <option value="3">Bab 3: 算法</option>
+                        <option value="4">Bab 4: 编程与 HTML</option>
+                    </select>
+                </div>
+
+                <div class="text-sm text-slate-500">
+                    目前已加载 <span id="question-count" class="font-bold text-indigo-600">0</span> 道经典练习题
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="questions-container" class="space-y-6">
+                <!-- Questions injected via JS -->
+            </div>
+
+        </div>
+
+
+        <!-- TAB 3: 辅助工具 (TOOLS) -->
+        <div id="tab-tools" class="hidden space-y-8">
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Binary Converter Tool -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-indigo-900 mb-4 flex items-center">
+                        <span class="mr-2">🔢</span> 二进制与十进制转换器
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">输入十进制整数 (Sistem Perpuluhan):</label>
+                            <input type="number" id="tool-dec" oninput="convertFromDec()" placeholder="例如：25" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">对应二进制 (Sistem Perduaan):</label>
+                            <input type="text" id="tool-bin" oninput="convertFromBin()" placeholder="例如：11001" class="w-full border border-slate-300 rounded-lg p-2 code-block focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div id="tool-calc-steps" class="p-3 bg-slate-50 rounded-lg border text-xs text-slate-600 space-y-1">
+                            提示：输入数字后自动计算转换步骤。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASCII Lookup Tool -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-indigo-900 mb-4 flex items-center">
+                        <span class="mr-2">🔤</span> ASCII 字符与二进制速查
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">输入单字符 (Huruf / Aksara):</label>
+                            <input type="text" id="tool-char" maxlength="1" oninput="lookupASCII()" placeholder="例如：A" class="w-full border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-100 space-y-2 text-xs">
+                            <p><strong>十进制 ASCII 码:</strong> <span id="ascii-dec" class="font-bold text-indigo-700">-</span></p>
+                            <p><strong>二进制 ASCII 码 (8-bit):</strong> <span id="ascii-bin" class="font-bold text-indigo-700 code-block">-</span></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-center text-xs">
+        <p>Asas Sains Komputer (ASK) Tingkatan 1 Review Kit & Question Bank</p>
+        <p class="mt-1 text-slate-500">严格遵循 KSSM 初一 ASK 课程标准纲要编制</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Database of Questions
+        const questionsDB = [
+            // Bab 1
+            {
+                id: 1,
+                chapter: 1,
+                type: "single",
+                title: "1.1 计算思维概念 (Konsep Pemikiran Komputasional)",
+                question: "在计算思维中，将一个复杂的大问题拆解成多个容易管理的小部分 (Bahagian-bahagian kecil) 的过程称为什么？",
+                options: ["Teknik Peniskalaan (抽象化)", "Teknik Leraian (拆解法)", "Teknik Pengitlakan (概括法)", "Teknik Pengecaman Corak (模式识别)"],
+                correct: 1,
+                explanation: "Teknik Leraian (Decomposition/拆解法) 的定义就是将复杂问题分解为较小部分以便独立分析与解决。"
+            },
+            {
+                id: 2,
+                chapter: 1,
+                type: "single",
+                title: "1.1 计算思维概念",
+                question: "地图设计者在制作地铁路线图时，忽略了地面建筑物的颜色和具体形状，只保留站点与连接线路。这应用了哪种计算思维技术？",
+                options: ["Teknik Leraian", "Teknik Pengecaman Corak", "Teknik Peniskalaan", "Teknik Pengitlakan"],
+                correct: 2,
+                explanation: "Teknik Peniskalaan (Abstraction/抽象化) 专注于关键要素 (Aspek Penting)，排除不重要的次要细节 (Aspek Kurang Penting)。"
+            },
+            {
+                id: 3,
+                chapter: 1,
+                type: "single",
+                title: "1.1.4 最佳路径决策",
+                question: "邮递员需要依次前往 5 个村庄，道路 $A-D$ 目前正处于修路瘫痪状态。在制定递送路线时，以下哪项属于必须考虑的“关键要素 (Aspek Penting)”？",
+                options: [
+                    "村庄邮政编码的颜色",
+                    "选择不包含道路 A-D 且总距离最短的路线",
+                    "邮递员使用的摩托车品牌",
+                    "村庄居民的总人口数"
+                ],
+                correct: 1,
+                explanation: "决策关键要素是指直接影响目标输出（不经过坏路且最短时间/路径）的必要约束条件。"
+            },
+
+            // Bab 2
+            {
+                id: 4,
+                chapter: 2,
+                type: "single",
+                title: "2.1.2 进制转换",
+                question: "请将二进制数 $101101_2$ 转换为十进制数 (Sistem Perpuluhan)。",
+                options: ["$43_{10}$", "$45_{10}$", "$37_{10}$", "$53_{10}$"],
+                correct: 1,
+                explanation: "$101101_2 = (1 \\times 32) + (0 \\times 16) + (1 \\times 8) + (1 \\times 4) + (0 \\times 2) + (1 \\times 1) = 32 + 8 + 4 + 1 = 45_{10}$。"
+            },
+            {
+                id: 5,
+                chapter: 2,
+                type: "single",
+                title: "2.1.3 进制转换",
+                question: "请将十进制数 $84_{10}$ 转换为二进制数 (Sistem Perduaan)。",
+                options: ["$1010100_2$", "$1100100_2$", "$1001100_2$", "$1010010_2$"],
+                correct: 0,
+                explanation: "使用除以 2 取余数法：$84 \\div 2 = 42$ (余0), $42 \\div 2 = 21$ (余0), $21 \\div 2 = 10$ (余1), $10 \\div 2 = 5$ (余0), $5 \\div 2 = 2$ (余1), $2 \\div 2 = 1$ (余0), $1 \\div 2 = 0$ (余1)。倒序组合得到 $1010100_2$。"
+            },
+            {
+                id: 6,
+                chapter: 2,
+                type: "single",
+                title: "2.1.4 二进制加法",
+                question: "计算二进制加法：$1011_2 + 1101_2$ 的结果是多少？",
+                options: ["$10000_2$", "$11000_2$", "$10100_2$", "$11100_2$"],
+                correct: 1,
+                explanation: "$1011_2 (11_{10}) + 1101_2 (13_{10}) = 24_{10} = 11000_2$。遵照二进制加法进位规则：$1+1=10_2$。"
+            },
+            {
+                id: 7,
+                chapter: 2,
+                type: "single",
+                title: "2.1.6 ASCII 码应用",
+                question: "已知字符 'C' 的二进制 ASCII 码是 $01000011_2$（即十进制 $67$），请问字符 'F' 的二进制 ASCII 码是多少？",
+                options: ["$01000100_2$", "$01000101_2$", "$01000110_2$", "$01000111_2$"],
+                correct: 2,
+                explanation: "'F' 在字母表中比 'C' 大 $3$ 个位置。十进制 ASCII 码为 $67 + 3 = 70$。将 $70_{10}$ 转换为 8 位二进制为 $01000110_2$。"
+            },
+            {
+                id: 8,
+                chapter: 2,
+                type: "single",
+                title: "2.2.3 图像属性",
+                question: "如果将一张数字图片的色彩深度 (Colour Depth) 从 8-bit (256色) 增加到 24-bit (真彩色)，对图片会产生什么影响？",
+                options: [
+                    "图片尺寸变小，质量降低",
+                    "颜色种类增加，图片文件体积 (Saiz Fail) 显著增大",
+                    "图片分辨率下降",
+                    "文件体积变小，质量提高"
+                ],
+                correct: 1,
+                explanation: "色彩深度越高，每个像素占用的位（bit）越多，所能表达的色彩越丰富，但文件所占存储空间也随之成倍增长。"
+            },
+            {
+                id: 9,
+                chapter: 2,
+                type: "single",
+                title: "2.2.6 数据单位换算",
+                question: "请问一个 $2 \text{ MB}$ 的音频文件，换算成字节 (Byte) 是多少？",
+                options: ["$2000 \text{ Bytes}$", "$2048 \text{ Bytes}$", "$2,097,152 \text{ Bytes}$", "$16,777,216 \text{ Bytes}$"],
+                correct: 2,
+                explanation: "$1 \text{ MB} = 1024 \text{ KB} = 1024 \\times 1024 \text{ Bytes} = 1,048,576 \text{ Bytes}$。因此 $2 \text{ MB} = 2 \\times 1,048,576 = 2,097,152 \text{ Bytes}$。"
+            },
+
+            // Bab 3
+            {
+                id: 10,
+                chapter: 3,
+                type: "single",
+                title: "3.1.1 流程图符号",
+                question: "在流程图 (Carta Alir) 中，用于表示“条件判断 (Pilihan / Decision)”的几何图形符号是什么？",
+                options: ["矩形 (Rectangle)", "平行四边形 (Parallelogram)", "菱形 (Diamond)", "椭圆形 (Oval)"],
+                correct: 2,
+                explanation: "菱形 (Diamond) 用于选择结构，代表根据条件产生 Ya 或 Tidak 的分支路线。"
+            },
+            {
+                id: 11,
+                chapter: 3,
+                type: "single",
+                title: "3.1.3 错误检测 (Pengesanan Ralat)",
+                question: "程序员在编写计算平均分的程序时，误将求和公式写成了 `Jumlah = Markah1 - Markah2`。这种错误属于哪种类型？",
+                options: ["Ralat Sintaks (语法错误)", "Ralat Logik (逻辑错误)", "Ralat Masa Larian (运行时错误)", "Ralat Hardware (硬件错误)"],
+                correct: 1,
+                explanation: "Ralat Logik (逻辑错误) 是指程序能正常编译运行，但算法逻辑错误导致输出不正确的结果。"
+            },
+
+            // Bab 4
+            {
+                id: 12,
+                chapter: 4,
+                type: "single",
+                title: "4.1.1 Python 运算符",
+                question: "在 Python 语言中，算术表达式 `17 % 5` 执行后的计算结果是多少？",
+                options: ["3", "2", "3.4", "1"],
+                correct: 1,
+                explanation: "`%` 是取模 (Modulus) 运算符，返回除法的余数。$17 \\div 5 = 3$ 余 $2$，因此结果为 $2$。"
+            },
+            {
+                id: 13,
+                chapter: 4,
+                type: "single",
+                title: "4.2.2 HTML 标签",
+                question: "在 HTML 网页代码中，如果需要在网页上插入一张图像，应该使用哪一个 Tag？",
+                options: ["`&lt;link src="..."&gt;`", "`&lt;a href="..."&gt;`", "`&lt;img src="..."&gt;`", "`&lt;picture&gt;`"],
+                correct: 2,
+                explanation: "`&lt;img src="文件名"&gt;` 是 HTML 中插入图像的标准标签。"
+            }
+        ];
+
+        // Switch Tabs Function
+        function switchTab(tabName) {
+            document.getElementById('tab-notes').classList.add('hidden');
+            document.getElementById('tab-quiz').classList.add('hidden');
+            document.getElementById('tab-tools').classList.add('hidden');
+
+            document.getElementById('btn-notes').classList.remove('active');
+            document.getElementById('btn-quiz').classList.remove('active');
+            document.getElementById('btn-tools').classList.remove('active');
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabName}`).classList.add('active');
+
+            if (tabName === 'quiz') {
+                renderQuestions();
+            }
+        }
+
+        // Filter and Render Questions
+        function filterQuestions() {
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const filterVal = document.getElementById('chapter-filter').value;
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            const filtered = questionsDB.filter(q => filterVal === 'all' || q.chapter.toString() === filterVal);
+            document.getElementById('question-count').innerText = filtered.length;
+
+            filtered.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4";
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIdx) => {
+                    optionsHTML += `
+                        <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-100 hover:bg-indigo-50/50 cursor-pointer transition text-sm">
+                            <input type="radio" name="q-${q.id}" value="${optIdx}" onchange="checkAnswer(${q.id}, ${optIdx}, ${q.correct})" class="text-indigo-600 focus:ring-indigo-500">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center text-xs text-slate-500 border-b pb-2">
+                        <span class="font-bold text-indigo-600">题目 ${idx + 1} · ${q.title}</span>
+                        <span class="bg-slate-100 px-2 py-0.5 rounded">Bab ${q.chapter}</span>
+                    </div>
+                    <h4 class="font-semibold text-slate-800 leading-relaxed">${q.question}</h4>
+                    <div class="space-y-2">
+                        ${optionsHTML}
+                    </div>
+                    <div id="feedback-${q.id}" class="hidden p-3 rounded-lg text-xs space-y-1"></div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Check Quiz Answer
+        function checkAnswer(qId, selectedIdx, correctIdx) {
+            const feedbackEl = document.getElementById(`feedback-${qId}`);
+            const qObj = questionsDB.find(q => q.id === qId);
+
+            feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+
+            if (selectedIdx === correctIdx) {
+                feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                feedbackEl.innerHTML = `
+                    <p class="font-bold">✅ 回答正确！</p>
+                    <p>${qObj.explanation}</p>
+                `;
+            } else {
+                feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                feedbackEl.innerHTML = `
+                    <p class="font-bold">❌ 回答错误</p>
+                    <p>正确答案是：<strong>${qObj.options[correctIdx]}</strong></p>
+                    <p class="mt-1">${qObj.explanation}</p>
+                `;
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // Tools: Dec to Bin
+        function convertFromDec() {
+            const decVal = parseInt(document.getElementById('tool-dec').value);
+            const stepsEl = document.getElementById('tool-calc-steps');
+
+            if (isNaN(decVal) || decVal < 0) {
+                document.getElementById('tool-bin').value = '';
+                stepsEl.innerHTML = '提示：输入有效的非负整数。';
+                return;
+            }
+
+            const binVal = decVal.toString(2);
+            document.getElementById('tool-bin').value = binVal;
+
+            stepsEl.innerHTML = `
+                <p class="font-bold text-slate-700">转换分析 (${decVal} $\\rightarrow$ 二进制):</p>
+                <p>• 二进制结果: <span class="code-block font-bold text-indigo-600">${binVal}_2</span></p>
+                <p>• 占用 Byte 字节数: ${Math.ceil(binVal.length / 8) || 1} Byte (${binVal.padStart(Math.ceil(binVal.length/8)*8, '0')})</p>
+            `;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Tools: Bin to Dec
+        function convertFromBin() {
+            const binStr = document.getElementById('tool-bin').value.trim();
+            const stepsEl = document.getElementById('tool-calc-steps');
+
+            if (!/^[01]+$/.test(binStr)) {
+                document.getElementById('tool-dec').value = '';
+                stepsEl.innerHTML = '提示：请输入仅包含 0 和 1 的二进制数字。';
+                return;
+            }
+
+            const decVal = parseInt(binStr, 2);
+            document.getElementById('tool-dec').value = decVal;
+
+            stepsEl.innerHTML = `
+                <p class="font-bold text-slate-700">转换分析 (${binStr}_2 $\\rightarrow$ 十进制):</p>
+                <p>• 十进制结果: <span class="font-bold text-indigo-600">${decVal}_{10}</span></p>
+            `;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Tools: ASCII Lookup
+        function lookupASCII() {
+            const char = document.getElementById('tool-char').value;
+            if (!char) {
+                document.getElementById('ascii-dec').innerText = '-';
+                document.getElementById('ascii-bin').innerText = '-';
+                return;
+            }
+
+            const dec = char.charCodeAt(0);
+            const bin = dec.toString(2).padStart(8, '0');
+
+            document.getElementById('ascii-dec').innerText = `${dec}`;
+            document.getElementById('ascii-bin').innerText = `${bin}`;
+        }
+    </script>
+</body>
+</html>

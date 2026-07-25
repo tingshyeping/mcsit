@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微处理器与个人计算机发展史</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f6f1e7;
+            --bg-deep: #efe4d6;
+            --ink: #171717;
+            --muted: #5b5b5b;
+            --accent: #d3542c;
+            --accent-light: #ff8f5a;
+            --accent-dark: #b14320;
+            --teal: #1f6f78;
+            --card: #fff7ef;
+            --stroke: #e3d6c5;
+            --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
+            --space-1: 6px;
+            --space-2: 8px;
+            --space-3: 10px;
+            --space-4: 12px;
+            --space-5: 14px;
+            --space-6: 16px;
+            --space-7: 18px;
+            --space-8: 20px;
+            --space-9: 24px;
+            --space-10: 32px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --error: #b54832;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(240px 140px at 10% -10%, #ffd2b9 0%, transparent 70%),
+                radial-gradient(220px 160px at 90% 0%, #cfe7e6 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--space-10) var(--space-8);
+            box-sizing: border-box;
+            background: var(--card);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-text {
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct { color: var(--teal); }
+        .status-wrong { color: var(--error); }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item:hover:not(.selected) {
+            background-color: var(--card);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .option-item.selected.correct {
+            background-color: rgba(31, 111, 120, 0.12);
+            border-color: var(--teal);
+        }
+
+        .option-item.selected.incorrect {
+            background-color: rgba(181, 72, 50, 0.12);
+            border-color: var(--error);
+        }
+
+        .option-item.revealed-correct {
+            border-color: rgba(31, 111, 120, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(31, 111, 120, 0.16);
+        }
+
+        .option-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-state {
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .selected .feedback-state {
+            display: block;
+        }
+
+        .revealed-correct .feedback-state {
+            display: block;
+        }
+
+        .correct .feedback-state { color: var(--teal); }
+        .incorrect .feedback-state { color: var(--error); }
+        .revealed-correct .feedback-state { color: var(--teal); }
+
+        .rationale {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .selected .rationale {
+            display: block;
+        }
+
+        .revealed-correct .rationale {
+            display: block;
+        }
+        .hint-toggle {
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-6);
+            border-radius: var(--radius-md);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hint-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .hint-content {
+            margin-top: 32px;
+            padding: var(--space-6);
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            font-size: 0.95em;
+            color: var(--muted);
+            display: none;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .hint-content.active {
+            display: flex;
+        }
+
+        .hint-icon-box {
+            color: var(--accent-dark);
+            font-size: 1.2em;
+            margin-top: -2px;
+        }
+
+        .navigation {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-7);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-prev {
+            background-color: #fff;
+            color: var(--ink);
+            border-color: var(--stroke);
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: #fff;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .results-screen {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .results-title {
+            font-family: var(--font-display);
+            font-size: 2.1em;
+            margin: 0;
+        }
+
+        .results-subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .result-card {
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--stroke);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-family: var(--font-display);
+        }
+
+        .result-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid var(--stroke);
+            color: var(--ink);
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .quiz-container {
+                margin: var(--space-8);
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .quiz-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .option-item {
+                padding: var(--space-4);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                margin: var(--space-6);
+                padding: var(--space-7) var(--space-5);
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-4);
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hint-toggle {
+                justify-content: space-between;
+            }
+
+            .results-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-content">
+            <!-- Dynamic Content -->
+        </div>
+        <div id="results-content" class="hidden"></div>
+
+        <div id="hint-box" class="hint-content">
+            <div class="hint-icon-box">💡</div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="hint-toggle" class="hint-toggle">
+                <span>Hint</span>
+                <span id="hint-icon-arrow">▼</span>
+            </button>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-prev">Previous</button>
+                <button id="next-btn" class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [{"answerOptions":[{"isCorrect":true,"rationale":"Z3 是第一台通用程序控制计算机，使用电磁继电器而非真空管或晶体管构建。","text":"电磁继电器"},{"isCorrect":false,"rationale":"晶体管是在 1947 年发明的，这晚于 Z3 的建造时间。","text":"晶体管"},{"isCorrect":false,"rationale":"微处理器是 20 世纪 70 年代才出现的，属于超大规模集成电路时代的产物。","text":"微处理器"},{"isCorrect":false,"rationale":"虽然中期的 ENIAC 使用了真空管，但 Z3 使用的是机械式的电磁继电器。","text":"真空管"}],"hint":"回想 20 世纪 40 年代初第一台通用计算机所使用的电气组件。","question":"根据提供的内容，Konrad Zuse 在 1941 年建造的 Z3 计算机是由哪种硬件技术构建的？"},{"answerOptions":[{"isCorrect":false,"rationale":"穿孔纸带通常用于输入程序，如 Z3，而不是作为计算机的再生内存。","text":"穿孔纸带"},{"isCorrect":true,"rationale":"ABC 使用旋转鼓内存，其原理是基于电容器的再生存储，类似于现代 RAM。","text":"带电容器的再生存储器"},{"isCorrect":false,"rationale":"磁芯存储器是 20 世纪 50 年代流行的技术，而 ABC 使用的是电容式的旋转鼓。","text":"磁芯存储器"},{"isCorrect":false,"rationale":"虽然 ABC 是电子计算机，但这里指的是它的存储机制而非逻辑运算单元。","text":"真空管逻辑单元"}],"hint":"这种存储方式与现代 RAM 有相似之处，并依赖于电学元件的电荷存储。","question":"Atanasoff-Berry 计算机 (ABC) 的主要存储介质使用了以下哪项技术？"},{"answerOptions":[{"isCorrect":true,"rationale":"ENIAC 是一台体型巨大的机器，重达 30 吨，占据了整个房间。","text":"30 吨"},{"isCorrect":false,"rationale":"这超出了原文中描述的规模，原文明确指出是 30 吨。","text":"100 吨"},{"isCorrect":false,"rationale":"这个数字大约是 ENIAC 实际重量的一半。","text":"15 吨"},{"isCorrect":false,"rationale":"虽然这也很重，但远低于 ENIAC 实际的 30 吨重量。","text":"5 吨"}],"hint":"回想关于 ENIAC 规模的描述，它比当时其他同类机器大 100 倍。","question":"ENIAC（电子数值积分计算机）在 1949 年建成时的物理重量大约是多少？"},{"answerOptions":[{"isCorrect":false,"rationale":"事实上 ABC 是第一台电子原型机，而 Z3 才是由继电器构成的。","text":"因为它由电磁继电器构成"},{"isCorrect":true,"rationale":"根据材料，ABC 虽然是第一台电子原型机，但它不具备存储程序的功能。","text":"因为它不是存储程序计算机"},{"isCorrect":false,"rationale":"材料并没有提到它使用模拟信号，主要区别在于它不支持程序存储。","text":"因为它使用了模拟信号而非数字信号"},{"isCorrect":false,"rationale":"Atanasoff 开发它的初衷正是为了解决复杂的方程，但这不影响它是否是现代计算机的定义。","text":"因为它无法解决复杂的物理方程"}],"hint":"注意区分“电子计算机原型”与具备“存储程序”概念的现代计算机架构。","question":"为什么 ABC 计算机不被视为“现代计算机”？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是质能方程，与计算机芯片的面积和时间权衡无关。","text":"$E = mc^2$ 公式"},{"isCorrect":true,"rationale":"VLSI 模型通过 $A$（芯片面积）和 $T$（计算步数）的权衡不等式来分析问题复杂性。","text":"$AT^2$ 乘积"},{"isCorrect":false,"rationale":"虽然逻辑门很重要，但在 VLSI 研究中，核心的权衡指标是面积与时间的乘积。","text":"二进制逻辑门的数量"},{"isCorrect":false,"rationale":"冯·诺依曼模型描述的是计算机的体系结构，而不是 VLSI 芯片布局的复杂度权衡。","text":"冯·诺依曼结构模型"}],"hint":"考虑面积 $A$ 和解决问题所需的步数 $T$。","question":"在 VLSI 模型中，研究人员使用什么来建立复杂性与硬件资源之间的权衡关系？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是 Altair 8800 等早期个人电脑兴起的时间，不是 4004 的发布年份。","text":"1975 年"},{"isCorrect":false,"rationale":"这是 Compaq Portable 电脑发布的年份。","text":"1982 年"},{"isCorrect":false,"rationale":"这是 ABC 计算机原型的完成时间，早于微处理器时代几十年。","text":"1942 年"},{"isCorrect":true,"rationale":"Intel 4004 被认为是世界上第一款微处理器，于 1971 年底发布。","text":"1971 年 11 月 15 日"}],"hint":"这是 20 世纪 70 年代初期的重要突破。","question":"第一款微处理器 Intel 4004 是在什么时候发布的？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然这很多，但材料明确提到的量级是 1000 亿。","text":"10 亿种"},{"isCorrect":false,"rationale":"这个数字远小于 Enigma 实际具备的千亿级组合能力。","text":"100 万种"},{"isCorrect":true,"rationale":"材料指出，Enigma 机器拥有高达 1000 亿种可能的组合，使其在当时极难破解。","text":"1000 亿种"},{"isCorrect":false,"rationale":"图中显示的 456,118 只是一个特定的组合设置示例，并非总数。","text":"456,118 种"}],"hint":"这是一个极大的数字，使得仅仅拥有机器而不掌握设置是毫无用处的。","question":"在二战期间，德国军队使用的加密设备“Enigma”机器有多少种可能的组合？"},{"answerOptions":[{"isCorrect":false,"rationale":"材料只具体强调了他在马拉松和越野跑方面的长跑天赋。","text":"铁人三项"},{"isCorrect":false,"rationale":"材料中没有提及他在游泳方面的运动成就。","text":"游泳"},{"isCorrect":true,"rationale":"图表提到 Turing 的马拉松最好成绩仅比 1948 年奥运会冠军慢 11 分钟。","text":"长跑"},{"isCorrect":false,"rationale":"材料将他描述为一名顶尖的长跑运动员，而非团队球类运动员。","text":"足球"}],"hint":"想想需要极强耐力的田径运动。","question":"Alan Turing 除了是著名的密码破译者和数学家，还在哪项运动中达到了世界级的马拉松标准？"},{"answerOptions":[{"isCorrect":false,"rationale":"这在 VLSI 芯片内部的处理器设计中是不现实的。","text":"通过卫星链路传输"},{"isCorrect":true,"rationale":"收缩阵列中的处理器同步运行，且只与阵列中的相邻处理器交换信息。","text":"仅与其最近的邻居通信"},{"isCorrect":false,"rationale":"这种方式会导致效率低下，收缩阵列采用的是局部的点对点通信。","text":"通过中央总线广播"},{"isCorrect":false,"rationale":"收缩阵列通常是分布式本地存储和流水线式数据流通信。","text":"直接访问共享内存"}],"hint":"这种设计模拟了类似心脏有节奏收缩的局部流动。","question":"“收缩阵列”（Systolic Array）这种处理器的主要通信方式是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"根据 RAM 模型定义，READ 改变 $out\\ wrd$ 为地址 $addr$ 处的值。","text":"将存储在特定地址的数据字值更改为输出字的值"},{"isCorrect":false,"rationale":"这是程序计数器的功能，而不是单条 READ 指令的任务。","text":"将程序的当前行数增加 1"},{"isCorrect":false,"rationale":"这是 WRITE 指令的功能，而不是 READ 指令。","text":"用输入字的值替换特定地址处的数据字"},{"isCorrect":false,"rationale":"这是 NO-OP 指令的功能。","text":"在地址解码器中跳过当前操作"}],"hint":"考虑数据是从内存流向输出，还是从输入流向内存。","question":"根据有界内存随机存取机（RAM）模型，READ 指令的功能是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这个数字接近 ENIAC 的功率（瓦特）或复杂程度，而不是 4004 的晶体管数。","text":"140,000 个"},{"isCorrect":false,"rationale":"这可能与 108 kHz 的时钟速度混淆，而不是晶体管数量。","text":"108,000 个"},{"isCorrect":false,"rationale":"这在当时已经是极大规模了，而 4004 实际上只有 2300 个。","text":"20,000 个"},{"isCorrect":true,"rationale":"Intel 4004 作为首款 4 位 CPU，其电路规模包含了约 2300 个晶体管。","text":"2,300 个"}],"hint":"在 1971 年，这种集成规模被认为是划时代的突破。","question":"Intel 4004 电路大约由多少个晶体管组成？"},{"answerOptions":[{"isCorrect":false,"rationale":"Z80 在 1976 年才开始制造，比 Altair 8800 的发布稍晚。","text":"Zilog Z80"},{"isCorrect":false,"rationale":"4004 是 4 位 CPU，主要用于计算器，而非早期的个人电脑。","text":"Intel 4004"},{"isCorrect":true,"rationale":"Altair 8800 被认为是第一款面向家庭用户的流行微机，它采用了 Intel 8080。","text":"Intel 8080"},{"isCorrect":false,"rationale":"6800 是 8080 的竞争对手，但不是 Altair 8800 的核心。","text":"Motorola 6800"}],"hint":"这是 Intel 的第一款 8 位微处理器之一，发布于 1974 年。","question":"1975 年发布的 Altair 8800 计算机主要是基于哪款 CPU 设计的？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然他们可能雇佣了人才，但核心的合法手段是针对 BIOS 的逆向工程。","text":"直接雇佣了 IBM 的离职工程师"},{"isCorrect":false,"rationale":"关键在于如何合法地模仿受版权保护的软件（BIOS），而非专利漏洞。","text":"利用了 IBM 未申请专利的漏洞"},{"isCorrect":false,"rationale":"Compaq 并没有购买授权，而是通过自主研究绕过了法律限制。","text":"从 IBM 购买了正式的许可授权"},{"isCorrect":true,"rationale":"Compaq 法律上通过逆向工程复制了 BIOS，因为 IBM 使用了大部分“现成”部件。","text":"通过花费 100 万美元进行逆向工程"}],"hint":"这种方法在当时成本极高，旨在通过观察外部行为而非查看源码来复制功能。","question":"Compaq 公司如何成功地合法复制了 IBM PC 的核心部分以生产“克隆机”？"},{"answerOptions":[{"isCorrect":true,"rationale":"微软最初是以“Micro-soft”这个带有连字符的名称成立的。","text":"Micro-soft"},{"isCorrect":false,"rationale":"Intel 是由 Hoff、Faggin 等人所在的公司，不是 Gates 创立的。","text":"Intel"},{"isCorrect":false,"rationale":"MITS 是制造 Altair 8800 的公司，微软为其开发软件。","text":"MITS"},{"isCorrect":false,"rationale":"Zilog 是由 Federico Faggin 离开 Intel 后创立的竞争对手公司。","text":"Zilog"}],"hint":"现在的名称中去掉了中间的连字符。","question":"Bill Gates 和 Paul Allen 最初在阿尔伯克基创立的公司名称是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"触发器通常用于存储二进制位（内存），而不是单纯的组合逻辑功能。","text":"触发器（Flip-flops）"},{"isCorrect":false,"rationale":"寄存器是 CPU 内部用于快速存储临时数据的组件。","text":"寄存器（Registers）"},{"isCorrect":true,"rationale":"在数字电路中，实现这些基础布尔逻辑功能的物理设备称为逻辑门。","text":"门（Gates）"},{"isCorrect":false,"rationale":"总线是用于在计算机组件之间传输信号的线路。","text":"总线（Buses）"}],"hint":"这是构建所有数字计算机的基础逻辑单元。","question":"在布尔函数中，物理上计算 AND、OR、NOT 和 EXCLUSIVE OR 功能的器件被称为："},{"answerOptions":[{"isCorrect":false,"rationale":"微软在 4004 发布时尚未成立，且微软主要开发软件。","text":"微软 (Microsoft)"},{"isCorrect":false,"rationale":"摩托罗拉是 Intel 的竞争对手，拥有自己的处理器系列（如 6800）。","text":"摩托罗拉 (Motorola)"},{"isCorrect":false,"rationale":"IBM 后来的 PC 采用了 Intel 处理器，但 4004 是为 Busicom 设计的。","text":"IBM"},{"isCorrect":true,"rationale":"Intel 4004 最初是为 Busicom 公司的计算器系列定制开发的。","text":"日本公司 Busicom"}],"hint":"这是一家生产计算器的日本企业。","question":"Intel 4004 最初是为哪家公司设计的？"},{"answerOptions":[{"isCorrect":false,"rationale":"布尔逻辑门是逻辑电路的基础，而代数电路处理更广泛的代数运算。","text":"布尔与门"},{"isCorrect":false,"rationale":"它包括多种非二进制函数，不仅仅是乘法。","text":"仅限乘法器"},{"isCorrect":false,"rationale":"这些通常属于时序逻辑或有限状态机，而非代数电路的核心算子。","text":"二进制移位寄存器"},{"isCorrect":true,"rationale":"材料提到代数电路执行直行程序，其操作符是非二进制函数（如环上的加法）。","text":"非二进制函数"}],"hint":"与逻辑电路处理 0 和 1 不同，代数电路处理更大集合上的运算。","question":"在代数电路中，执行“直行程序”（straight-line programs）的操作符通常是："},{"answerOptions":[{"isCorrect":false,"rationale":"这是逐元素乘法，通常被称为哈达玛积。","text":"$c_j = a_j b_j$"},{"isCorrect":true,"rationale":"卷积的数学定义是所有索引和为 $j$ 的元素乘积之和。","text":"$c_j = \\sum_{r+s=j} a_r b_s$"},{"isCorrect":false,"rationale":"这是简单的向量加法，不是卷积运算。","text":"$c_j = a_j + b_j$"},{"isCorrect":false,"rationale":"卷积涉及的是乘积的和，而不是和的乘积。","text":"$c_j = \\prod_{r+s=j} (a_r + b_s)$"}],"hint":"考虑所有满足索引 $r$ 和 $s$ 之和等于 $j$ 的项的组合。","question":"两个序列 $a$ 和 $b$ 的卷积 $c = a \\ast b$ 的第 $j$ 个分量 $c_j$ 是如何定义的？"},{"answerOptions":[{"isCorrect":false,"rationale":"MITS 成立于 70 年代，主要涉及个人微机套件。","text":"MITS"},{"isCorrect":true,"rationale":"Atanasoff 最初尝试修改租给学院的小型 IBM 计算器来解决物理问题。","text":"IBM"},{"isCorrect":false,"rationale":"微软是软件公司，不提供早期的机械或电子硬件租赁。","text":"微软"},{"isCorrect":false,"rationale":"Intel 是 1968 年成立的，晚于 Atanasoff 的研究时期。","text":"Intel"}],"hint":"由于 Atanasoff 对这台租赁机器进行了“过度的修改”，这家公司当时并不高兴。","question":"Atanasoff 最初在爱荷华州立大学（当时为学院）研究物理方程时，使用的计算机租赁自哪家公司？"},{"answerOptions":[{"isCorrect":false,"rationale":"没有内存就无法记录状态，这与有限状态机的定义相悖。","text":"它们不具备任何形式的内存"},{"isCorrect":false,"rationale":"收缩阵列内部的所有处理器通常都是相同的有限状态机。","text":"它们只能用于收缩阵列的边缘部分"},{"isCorrect":true,"rationale":"逻辑电路提供了基础，内存单元赋予了机器记录状态的能力。","text":"当逻辑电路与二进制内存单元结合时即可构造"},{"isCorrect":false,"rationale":"FSM 主要是处理二进制数据和状态的数字模型。","text":"它们仅能处理非二进制函数"}],"hint":"考虑逻辑门与存储单元的结合。","question":"关于有限状态机（FSM）的描述，以下哪项正确？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是 ENIAC 的典型特征，而不是 Robinson 机器的主要记载缺点。","text":"耗电量过高导致停电"},{"isCorrect":false,"rationale":"虽然它们很大，但材料中强调的是其运行的可靠性不足。","text":"体积比 ENIAC 还大"},{"isCorrect":true,"rationale":"材料明确指出 (Heath) Robinson 机器存在不可靠的问题。","text":"不可靠"},{"isCorrect":false,"rationale":"它们是用于密码破译的，只是性能和稳定性不佳。","text":"无法破译任何密码"}],"hint":"回想关于早期英国密码分析设备的稳定性评价。","question":"在二战期间，英国布莱切利园（Bletchley Park）开发的被称为“Robinsons”的机器存在什么主要缺点？"},{"answerOptions":[{"isCorrect":false,"rationale":"108 kHz 是 4 位处理器 4004 的时钟速度。","text":"它具有 108 kHz 的时钟速度"},{"isCorrect":false,"rationale":"8008 仍属于 8 位处理器，16 位是更晚的技术。","text":"它是第一款 16 位微处理器"},{"isCorrect":true,"rationale":"Intel 8008 是 4004 之后的一款重要产品，标志着 8 位时代的开始。","text":"它是早期的 8 位 CPU"},{"isCorrect":false,"rationale":"它是 Intel 自主设计的，后来 Zilog 的创始人 Federico Faggin 曾在此工作。","text":"它是基于 Zilog 架构设计的"}],"hint":"注意区分微处理器的位宽演进路径。","question":"1972 年 4 月推出的 Intel 8008 微处理器的主要特征是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"由于他在该领域的巨大声望，现代计算机常被称为“冯·诺依曼机”。","text":"John Von Neumann"},{"isCorrect":false,"rationale":"虽然他发明了第一台电子原型机，但其机器不是存储程序的。","text":"John Atanasoff"},{"isCorrect":false,"rationale":"他是后来的软件巨头，不是存储程序计算机架构的最初提出者。","text":"Bill Gates"},{"isCorrect":false,"rationale":"他是 Atanasoff 的研究生，协助开发了 ABC 计算机。","text":"Clifford Berry"}],"hint":"他的名字现在几乎成了现代计算机架构的代名词。","question":"根据材料，哪个人被最广泛地认为提出了“存储程序计算机”的想法？"},{"answerOptions":[{"isCorrect":false,"rationale":"那是后来商用计算机的用途，而非 ENIAC 的军事研发初衷。","text":"管理企业财务报表"},{"isCorrect":true,"rationale":"摩尔学院为美国陆军军械部和弹道研究实验室提供资源，目前的计算速度太慢。","text":"计算弹道轨迹"},{"isCorrect":false,"rationale":"虽然相关，但主要目标是加速生成弹道表。","text":"模拟核裂变反应"},{"isCorrect":false,"rationale":"这是英国 Bletchley Park 机器的任务，而非美国 ENIAC 的主攻方向。","text":"破译德国的 Enigma 密码"}],"hint":"考虑美国陆军在二战期间对远程火力的计算需求。","question":"ENIAC 的开发初衷是为了解决什么具体问题？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然名称相关，但在函数定义中它代表的是特定的值域集合。","text":"布尔代数的发明者 Boole"},{"isCorrect":false,"rationale":"在函数表示法中，指数部分（如 $n$）通常表示输入变量的数量。","text":"总线宽度"},{"isCorrect":true,"rationale":"在计算机科学中，$B$ 通常指代二进制值集合。","text":"二进制集合 $\\{0, 1\\}$"},{"isCorrect":false,"rationale":"在这里符号描述的是变量的映射关系，而不是数据存储单位。","text":"字节 (Byte)"}],"hint":"这是构成所有数字信号的基本二元单位。","question":"在布尔函数的符号表示 $f : B^n \\rightarrow B^m$ 中，字母 $B$ 代表什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"Faggin 在 1974 年离职，这导致 Intel 在后来的宣传中淡化了他的角色。","text":"因为他离开 Intel 创立了竞争对手公司 Zilog"},{"isCorrect":false,"rationale":"商业和法律上的争议源于公司竞争，而不是礼仪性活动。","text":"因为他没有参加 4004 的发布仪式"},{"isCorrect":false,"rationale":"虽然 4004 是为 Busicom 设计的，但 Intel 拥有相关权利，争端主要源于他的自立门户。","text":"因为他的设计属于 Busicom 公司而非 Intel"},{"isCorrect":false,"rationale":"8080 是非常成功的芯片，Faggin 的离职是由于商业竞争而非设计错误。","text":"因为他错误地设计了 8080 芯片"}],"hint":"回想 1974 年他在职业生涯上的重大变动及其后果。","question":"为什么 Intel 后来在专利和广告中“否认”了 Federico Faggin 对微处理器发明的贡献？"},{"answerOptions":[{"isCorrect":true,"rationale":"这是 Intel 4004 的最初设计用途，而 Z80 被广泛用于桌面和嵌入式系统。","text":"它主要用于日本的计算器"},{"isCorrect":false,"rationale":"Z80 属于材料中列举的第一批 8 位微处理器系列。","text":"它是一款 8 位微处理器"},{"isCorrect":false,"rationale":"材料提到 Z80 是有史以来最流行的 CPU 之一。","text":"它是历史上最受欢迎的 CPU 之一"},{"isCorrect":false,"rationale":"材料明确标注了其起始生产年份为 1976 年。","text":"它从 1976 年开始制造"}],"hint":"注意区分第一款微处理器的特定用途与后来通用 8 位 CPU 的用途。","question":"关于 Zilog Z80 处理器，以下哪项描述是不正确的？"},{"answerOptions":[{"isCorrect":false,"rationale":"它只保存下一条指令的地址，而不是程序本身。","text":"程序计数器 (prog ctr)"},{"isCorrect":true,"rationale":"图 1.6 显示程序和数据都保存在内存中。","text":"随机存取存储器 (Random-Access Memory)"},{"isCorrect":false,"rationale":"解码器的作用是解释指令，而不是作为存储介质。","text":"解码器 (Decode)"},{"isCorrect":false,"rationale":"ALU 负责计算操作，而不是长期存储指令或大量数据。","text":"算术逻辑单元 (ALU)"}],"hint":"这是计算机中用于存储正在运行的信息的通用区域。","question":"根据有界内存 RAM 模型的图示，哪一部分负责保存程序指令和数据？"},{"answerOptions":[{"isCorrect":true,"rationale":"由于美国卷入二战，政府征召技术专家支持战争努力。","text":"美国政府要求训练有素的技术人员加入二战工作"},{"isCorrect":false,"rationale":"材料没有提到他失去职位，只是强调了他应征加入海军实验室。","text":"因为他失去了爱荷华州立大学的教授职位"},{"isCorrect":false,"rationale":"ENIAC 是由宾夕法尼亚大学摩尔学院开发的，Atanasoff 并没有加入该团队。","text":"因为他获得了设计 ENIAC 的邀请"},{"isCorrect":false,"rationale":"材料指出 ABC 从未完全投入运行，因为项目在他离开后中断了。","text":"因为 ABC 已经完全开发成功并投入使用"}],"hint":"考虑 1942 年的全球政治和军事背景。","question":"1942 年，John Atanasoff 离开 ABC 项目去海军军械实验室工作的主要原因是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这不是函数映射的标准记号。","text":"$B(n, m)$"},{"isCorrect":false,"rationale":"这通常表示矩阵的维度或简单的乘法，而不是函数的输入输出映射。","text":"$f = n \\times m$"},{"isCorrect":true,"rationale":"这是数学上的标准表示法，用于定义定义域和值域的维度。","text":"$f : B^n \\rightarrow B^m$"},{"isCorrect":false,"rationale":"指数符号应该附在集合 $B$ 上，表示该集合的笛卡尔积次数。","text":"$f^n \\rightarrow B^m$"}],"hint":"想一想如何用指数表示法定义包含 $n$ 个二进制位的集合。","question":"在布尔函数中，如果我们要明确表示函数 $f$ 有 $n$ 个输入变量和 $m$ 个输出变量，通常如何书写？"},{"answerOptions":[{"isCorrect":true,"rationale":"微机的定义即以微处理器为核心，通常设计为供单人使用。","text":"使用微处理器作为其主要处理器"},{"isCorrect":false,"rationale":"虽然这是事实，但并不是微机的定义性特征，只是与大型机对比的结果。","text":"重量必须小于 30 吨"},{"isCorrect":false,"rationale":"MITS 只是早期微机制造商之一，还有很多其他公司生产微机。","text":"只能由 MITS 公司生产"},{"isCorrect":false,"rationale":"这是软件功能，不是微机的硬件定义特征。","text":"必须能够运行 BASIC 解释器"}],"hint":"注意其核心处理组件的规模。","question":"微型计算机 (Microcomputer) 的定义特征是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这个数字远低于材料中根据工时计算出的 28 年。","text":"5 年"},{"isCorrect":true,"rationale":"每条轨迹 20 小时，总共 60,000 小时，按每周 40 小时计算约为 28 年。","text":"28 年"},{"isCorrect":false,"rationale":"这仅仅是完成单一一条轨迹所需的时间。","text":"20 小时"},{"isCorrect":false,"rationale":"考虑到每条轨迹所需的巨大工作量，这显然是不可能的。","text":"100 天"}],"hint":"考虑完成整张表格所需的 60,000 小时的劳动量。","question":"一个熟练的操作员使用桌面计算器计算一个弹道表（3000 条轨迹）需要多长时间？"},{"answerOptions":[{"isCorrect":true,"rationale":"收缩阵列追求结构的规则性和经济性，通常由大量相同的单元组成。","text":"除了阵列边缘的处理器外，其余均是相同的"},{"isCorrect":false,"rationale":"它们是 VLSI 设计中非常重要的组成部分。","text":"它们不属于数字计算机的构建块"},{"isCorrect":false,"rationale":"收缩阵列是同步的，所有处理器在同一时间执行相同的操作。","text":"每个处理器执行不同的指令以提高灵活性"},{"isCorrect":false,"rationale":"它们必须与最近的邻居通信才能完成计算。","text":"处理器之间没有物理连接"}],"hint":"考虑芯片设计的规则性（Regularity）。","question":"关于收缩阵列内部处理器（FSM）的属性，以下哪项描述是准确的？"},{"answerOptions":[{"isCorrect":false,"rationale":"这通常是后来 8 位处理器的速度，如 6502 或 Z80。","text":"1 MHz"},{"isCorrect":false,"rationale":"这与 ENIAC 的瓦特数类似，不是 Intel 4004 的时钟参数。","text":"140,000 Hz"},{"isCorrect":false,"rationale":"这可能与晶体管数量混淆，不是频率单位。","text":"2,300 Hz"},{"isCorrect":true,"rationale":"根据材料引用自 Intel 博物馆的数据，其初始主频为 108 kHz。","text":"108 kHz"}],"hint":"回想 70 年代初第一代微处理器的较低运行频率。","question":"Intel 4004 的时钟速度大约是多少？"},{"answerOptions":[{"isCorrect":true,"rationale":"在逻辑图示中，门输出处的圆圈通常表示反转输出值。","text":"该门值的非运算（NOT）"},{"isCorrect":false,"rationale":"输入端的数量通过进入门的连线数量表示，而非圆圈。","text":"该门具有多个输入端"},{"isCorrect":false,"rationale":"图示符号用于表示静态逻辑功能，而非动态运行状态。","text":"该门处于待机状态"},{"isCorrect":false,"rationale":"在数字逻辑图中，圆圈具有特定的逻辑反转含义。","text":"该门是一个模拟放大器"}],"hint":"回想逻辑电路中表示“反相”或“取反”的通用习惯。","question":"在布尔代数中，带有圆圈前缀的门符号通常表示什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然两人后来有分歧，但材料明确归因为健康原因。","text":"与 Bill Gates 发生了法律纠纷"},{"isCorrect":false,"rationale":"他是该项目的资助者，但这并不是他离开微软的直接导火索。","text":"为了专注于 SETI 外星智慧搜寻项目"},{"isCorrect":false,"rationale":"他早年就从该大学辍学了，辞职不是为了重返校园。","text":"去华盛顿州立大学继续深造"},{"isCorrect":true,"rationale":"材料提到他在被诊断出这种疾病后不得不离开公司。","text":"被诊断出患有霍奇金病"}],"hint":"这是一种严重的医学状况。","question":"Paul Allen 因什么原因被迫从微软辞职？"},{"answerOptions":[{"isCorrect":false,"rationale":"Colossus 是英国开发的专用破译机器，不是由 Eckert 团队在美国开发的。","text":"Colossus"},{"isCorrect":true,"rationale":"ENIAC 是第一台完全运行的大型通用电子计算机。","text":"ENIAC"},{"isCorrect":false,"rationale":"ABC 是原型机，不是由 Eckert 和 Mauchly 开发的，而是 Atanasoff。","text":"ABC"},{"isCorrect":false,"rationale":"Z3 使用的是电磁继电器，不是基于真空管的电子计算机。","text":"Z3"}],"hint":"它重达 30 吨，耗电 14 万瓦。","question":"1940 年代中期，由 Eckert 和 Mauchly 开发的世界上第一台可编程电子计算机是："},{"answerOptions":[{"isCorrect":true,"rationale":"芯片上的物理空间有限，因此需要优化有限状态机的布局以节省溢价空间。","text":"因为芯片面积直接影响成本和设计的复杂性"},{"isCorrect":false,"rationale":"材料并未提及原材料短缺，重点在于设计效率和成本权衡。","text":"因为硅材料在 80 年代极度短缺"},{"isCorrect":false,"rationale":"速度受电路设计影响，而不仅仅是面积，且 108 kHz 是极低的速度。","text":"因为大面积芯片会导致时钟速度下降到 108 kHz"},{"isCorrect":false,"rationale":"通常情况下，缩减面积才是追求的目标，以便在更小的封装内实现更高性能。","text":"因为芯片越大，散热性能越好"}],"hint":"回想材料中提到的“溢价”（premium）一词与面积的关系。","question":"在 VLSI 布局研究中，为什么“芯片房地产”（chip real estate）受到高度重视？"},{"answerOptions":[{"isCorrect":true,"rationale":"材料明确指出 8080 的发布价格为 360 美元。","text":"$360"},{"isCorrect":false,"rationale":"这个数字虽然更接近，但与原文记载的 360 美元不符。","text":"$100"},{"isCorrect":false,"rationale":"这是整个 ABC 计算机的造价，而不是单片微处理器的价格。","text":"$6000"},{"isCorrect":false,"rationale":"这是支付给 Clifford Berry 的薪酬，不是 8080 的价格。","text":"$450"}],"hint":"这个价格现在看来很高，但在当时是高端技术的体现。","question":"Intel 8080 微处理器在 1974 年 4 月发布时的售价是多少？"},{"answerOptions":[{"isCorrect":true,"rationale":"这是西雅图最独特的预科学校，也是微软两位创始人的相遇地。","text":"湖滨学校 (Lakeside School)"},{"isCorrect":false,"rationale":"这是开发 ENIAC 的地方，与 Gates 的教育背景无关。","text":"摩尔工程学院"},{"isCorrect":false,"rationale":"他后来去哈佛学习，但在此之前已经结识了 Paul Allen。","text":"哈佛大学"},{"isCorrect":false,"rationale":"这是 Paul Allen 曾就读的学校，Gates 未曾在此就读。","text":"华盛顿州立大学"}],"hint":"这是一所位于西雅图的顶级私立学校。","question":"Bill Gates 曾经在以下哪所学校就读，并在此结识了 Paul Allen？"},{"answerOptions":[{"isCorrect":false,"rationale":"输出字母表的大小可以任意，只要能被二进制编码即可。","text":"字母表 $C$ 必须包含比 $A$ 更多的字母"},{"isCorrect":true,"rationale":"因为所有字符最终都转化为二进制位，二进制函数可以表示任何有限字母表的映射。","text":"假设函数是从 $B^n$ 到 $B^m$ 的映射不失一般性"},{"isCorrect":false,"rationale":"正是因为编码的存在，计算机才能通过二进制处理所有类型的字符。","text":"计算机将无法处理非二进制字母表中的字符串"},{"isCorrect":false,"rationale":"门数量取决于运算复杂度，而不是字母表本身的大小。","text":"逻辑门的数量必须与字母表 $A$ 的大小相等"}],"hint":"考虑数据表示的统一性原则。","question":"如果所有的有限字母表 $A$ 都可以被编码为二进制字母表 $B = \\{0, 1\\}$ 上的固定长度字符串，那么："},{"answerOptions":[{"isCorrect":false,"rationale":"“炸弹”机是用于破解 Enigma 机器的，而不是机密书写器。","text":"The Bombs (炸弹)"},{"isCorrect":true,"rationale":"巨像机专门用于破译比 Enigma 更复杂的 Lorenz 密码（Geheimschreiber）。","text":"Colossus (巨像)"},{"isCorrect":false,"rationale":"Z3 是德国科学家开发的，而不是盟军的破译机器。","text":"Z3"},{"isCorrect":false,"rationale":"ENIAC 主要用于弹道计算，不直接属于布莱切利园的破译项目。","text":"ENIAC"}],"hint":"这是世界上第一台全电子数字计算机（尽管是专用的）。","question":"二战中英国使用的专门用于破译德国机密书写器（Geheimschreiber）的机器叫什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是关机操作，不是指令集中的普通逻辑指令。","text":"关闭计算机电源"},{"isCorrect":true,"rationale":"NO-OP 代表“无操作”，即机器不改变任何内存或寄存器的值。","text":"什么都不做"},{"isCorrect":false,"rationale":"这通常是 RESET 指令或跳转指令的功能。","text":"重置程序计数器为 0"},{"isCorrect":false,"rationale":"这会导致数据丢失，不是“无操作”的含义。","text":"清除所有的 RAM 内容"}],"hint":"它的名称已经概括了它的全部功能。","question":"根据有界内存 RAM 模型，NO-OP 指令的作用是："},{"answerOptions":[{"isCorrect":false,"rationale":"他是 Intel 微处理器的主要设计师，与 40 年代的 ENIAC 无关。","text":"Marcian “Ted” Hoff"},{"isCorrect":false,"rationale":"Eckert 负责设计 ENIAC 的单个电路，而不是监督施工队。","text":"J. Presper Eckert"},{"isCorrect":true,"rationale":"材料明确指出 Joseph Chedaker 负责监督 ENIAC 的施工团队。","text":"Joseph Chedaker"},{"isCorrect":false,"rationale":"Mauchly 提出了整体设计方案，主要负责架构层面。","text":"John Mauchly"}],"hint":"他在项目成员名单中扮演着工程管理的角色。","question":"谁负责监督了 ENIAC 庞大的施工团队？"},{"answerOptions":[{"isCorrect":false,"rationale":"下标在这些函数表示法中另有含义，面积 $A$ 通常用于复杂度模型。","text":"下标表示芯片的物理面积 $A$"},{"isCorrect":false,"rationale":"这些表示法广泛应用于描述所有类型的数字计算函数。","text":"它们只用于描述代数电路，不用于逻辑电路"},{"isCorrect":true,"rationale":"材料说明 $f : B^n \\rightarrow B$ 时常省略 $B$ 后面的指数。","text":"当函数是布尔函数时，通常省略第二个上标"},{"isCorrect":false,"rationale":"指数代表变量数量，不一定是 1。","text":"指数必须始终是 1 以确保计算正确性"}],"hint":"回想在二进制函数记法中简化的规则。","question":"关于布尔函数映射的“上标”和“下标”符号，以下描述正确的是："}];
+        let currentIndex = 0;
+        let mode = 'quiz';
+        let state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+
+        function getStats() {
+            const answered = state.filter((s) => s.selectedIndex !== null).length;
+            const correct = state.filter((s, i) => s.selectedIndex !== null && quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const wrong = state.filter((s, i) => s.selectedIndex !== null && !quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const skipped = quizData.length - answered;
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { answered, correct, wrong, skipped, accuracy };
+        }
+
+        function shuffleAnswers() {
+            quizData.forEach((q) => {
+                for (let i = q.answerOptions.length - 1; i > 0; i -= 1) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.answerOptions[i], q.answerOptions[j]] = [q.answerOptions[j], q.answerOptions[i]];
+                }
+            });
+        }
+
+        function shuffleQuestions() {
+            for (let i = quizData.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+            }
+        }
+
+        function resetState() {
+            state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            const s = state[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            let optionsHtml = '';
+            const correctIndex = q.answerOptions.findIndex((o) => o.isCorrect);
+            const selectedCorrect = s.selectedIndex !== null && q.answerOptions[s.selectedIndex].isCorrect;
+            q.answerOptions.forEach((opt, idx) => {
+                const isSelected = s.selectedIndex === idx;
+                const statusClass = isSelected ? (opt.isCorrect ? 'correct' : 'incorrect') : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const revealCorrect = (s.selectedIndex !== null && !selectedCorrect && opt.isCorrect) || (mode === 'review' && opt.isCorrect);
+                const revealClass = revealCorrect ? 'revealed-correct' : '';
+
+                optionsHtml += `
+                    <li class="option-item ${selectedClass} ${statusClass} ${revealClass}" onclick="selectOption(${idx})">
+                        <div class="option-label">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                        </div>
+                        <div class="feedback-state">
+                            ${opt.isCorrect ? '✓ Right answer' : '✕ Not quite'}
+                        </div>
+                        ${opt.rationale ? '<div class="rationale">' + opt.rationale + '</div>' : ''}
+                    </li>
+                `;
+            });
+
+            const stats = getStats();
+
+            content.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-text">${currentIndex + 1} / ${quizData.length}</div>
+                    <div class="status-bar">
+                        <div class="status-item status-correct">
+                            <span>✓</span>
+                            <span>${stats.correct}</span>
+                        </div>
+                        <div class="status-item status-wrong">
+                            <span>✕</span>
+                            <span>${stats.wrong}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+            `;
+
+            // Update Hint Box
+            const hintText = document.getElementById('hint-text');
+            hintText.innerText = q.hint || 'No hint available for this question.';
+            if (s.hintVisible) {
+                hintBox.classList.add('active');
+            } else {
+                hintBox.classList.remove('active');
+            }
+
+            results.classList.add('hidden');
+            content.classList.remove('hidden');
+            hintBox.classList.remove('hidden');
+            nav.classList.remove('hidden');
+
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = false;
+            if (mode === 'review') {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Back to Results' : 'Next';
+            } else {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            }
+            document.getElementById('hint-icon-arrow').innerText = s.hintVisible ? '▲' : '▼';
+        }
+
+        function selectOption(idx) {
+            if (mode !== 'quiz') return;
+            if (state[currentIndex].selectedIndex !== null) return; // Prevent re-selection
+            state[currentIndex].selectedIndex = idx;
+            renderQuestion();
+        }
+
+        function toggleHint() {
+            if (mode === 'results') return;
+            state[currentIndex].hintVisible = !state[currentIndex].hintVisible;
+            renderQuestion();
+        }
+
+        function renderResults() {
+            const stats = getStats();
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+
+            const score = `${stats.correct} / ${quizData.length}`;
+
+            results.innerHTML = `
+                <div class="results-screen">
+                    <div>
+                        <h1 class="results-title">You did it! Quiz Complete.</h1>
+                        <p class="results-subtitle">Review your score or take another run.</p>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Score</div>
+                            <div class="result-value">${score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Accuracy</div>
+                            <div class="result-value">${stats.accuracy}%</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-metrics">
+                                <div>Right <strong>${stats.correct}</strong></div>
+                                <div>Wrong <strong>${stats.wrong}</strong></div>
+                                <div>Skipped <strong>${stats.skipped}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="review-btn" class="btn btn-ghost">Review Quiz</button>
+                        <button id="retake-btn" class="btn btn-next">Retake Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            content.classList.add('hidden');
+            results.classList.remove('hidden');
+            hintBox.classList.add('hidden');
+            nav.classList.add('hidden');
+
+            document.getElementById('review-btn').onclick = () => {
+                mode = 'review';
+                currentIndex = 0;
+                renderQuestion();
+            };
+
+            document.getElementById('retake-btn').onclick = () => {
+                mode = 'quiz';
+                currentIndex = 0;
+                shuffleQuestions();
+                shuffleAnswers();
+                resetState();
+                renderQuestion();
+            };
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (mode === 'review') {
+                if (currentIndex < quizData.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                } else {
+                    mode = 'results';
+                    renderResults();
+                }
+                return;
+            }
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                mode = 'results';
+                renderResults();
+            }
+        };
+
+        document.getElementById('hint-toggle').onclick = toggleHint;
+
+        renderQuestion();
+    </script>
+</body>
+</html>

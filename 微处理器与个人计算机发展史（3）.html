@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微处理器与个人计算机发展史 (3)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f6f1e7;
+            --bg-deep: #efe4d6;
+            --ink: #171717;
+            --muted: #5b5b5b;
+            --accent: #d3542c;
+            --accent-light: #ff8f5a;
+            --accent-dark: #b14320;
+            --teal: #1f6f78;
+            --card: #fff7ef;
+            --stroke: #e3d6c5;
+            --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
+            --space-1: 6px;
+            --space-2: 8px;
+            --space-3: 10px;
+            --space-4: 12px;
+            --space-5: 14px;
+            --space-6: 16px;
+            --space-7: 18px;
+            --space-8: 20px;
+            --space-9: 24px;
+            --space-10: 32px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --error: #b54832;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(240px 140px at 10% -10%, #ffd2b9 0%, transparent 70%),
+                radial-gradient(220px 160px at 90% 0%, #cfe7e6 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--space-10) var(--space-8);
+            box-sizing: border-box;
+            background: var(--card);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-text {
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct { color: var(--teal); }
+        .status-wrong { color: var(--error); }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item:hover:not(.selected) {
+            background-color: var(--card);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .option-item.selected.correct {
+            background-color: rgba(31, 111, 120, 0.12);
+            border-color: var(--teal);
+        }
+
+        .option-item.selected.incorrect {
+            background-color: rgba(181, 72, 50, 0.12);
+            border-color: var(--error);
+        }
+
+        .option-item.revealed-correct {
+            border-color: rgba(31, 111, 120, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(31, 111, 120, 0.16);
+        }
+
+        .option-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-state {
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .selected .feedback-state {
+            display: block;
+        }
+
+        .revealed-correct .feedback-state {
+            display: block;
+        }
+
+        .correct .feedback-state { color: var(--teal); }
+        .incorrect .feedback-state { color: var(--error); }
+        .revealed-correct .feedback-state { color: var(--teal); }
+
+        .rationale {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .selected .rationale {
+            display: block;
+        }
+
+        .revealed-correct .rationale {
+            display: block;
+        }
+        .hint-toggle {
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-6);
+            border-radius: var(--radius-md);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hint-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .hint-content {
+            margin-top: 32px;
+            padding: var(--space-6);
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            font-size: 0.95em;
+            color: var(--muted);
+            display: none;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .hint-content.active {
+            display: flex;
+        }
+
+        .hint-icon-box {
+            color: var(--accent-dark);
+            font-size: 1.2em;
+            margin-top: -2px;
+        }
+
+        .navigation {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-7);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-prev {
+            background-color: #fff;
+            color: var(--ink);
+            border-color: var(--stroke);
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: #fff;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .results-screen {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .results-title {
+            font-family: var(--font-display);
+            font-size: 2.1em;
+            margin: 0;
+        }
+
+        .results-subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .result-card {
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--stroke);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-family: var(--font-display);
+        }
+
+        .result-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid var(--stroke);
+            color: var(--ink);
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .quiz-container {
+                margin: var(--space-8);
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .quiz-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .option-item {
+                padding: var(--space-4);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                margin: var(--space-6);
+                padding: var(--space-7) var(--space-5);
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-4);
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hint-toggle {
+                justify-content: space-between;
+            }
+
+            .results-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-content">
+            <!-- Dynamic Content -->
+        </div>
+        <div id="results-content" class="hidden"></div>
+
+        <div id="hint-box" class="hint-content">
+            <div class="hint-icon-box">💡</div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="hint-toggle" class="hint-toggle">
+                <span>Hint</span>
+                <span id="hint-icon-arrow">▼</span>
+            </button>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-prev">Previous</button>
+                <button id="next-btn" class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [{"answerOptions":[{"isCorrect":false,"rationale":"虽然硬件测试在工程中很重要，但理论计算机科学更侧重于抽象层面的研究。","text":"物理实验与硬件测试"},{"isCorrect":false,"rationale":"编写程序是应用，而理论研究是为了理解这些活动背后的数学和逻辑本质。","text":"程序编写与调试"},{"isCorrect":true,"rationale":"理论计算机科学通过建立机器、语言或系统的模型，并利用分析方法研究其效率和局限性。","text":"模型与分析方法"},{"isCorrect":false,"rationale":"这些属于人机交互或软件工程的实践领域，而非理论计算机科学的核心范畴。","text":"市场调查与用户体验"}],"hint":"考虑理论研究中如何处理复杂系统的抽象表示。","question":"根据教材描述，理论计算机科学主要使用哪两种手段来研究计算机和计算？"},{"answerOptions":[{"isCorrect":true,"rationale":"卵石游戏在有向无环图上进行，通过在顶点放置卵石来模拟寄存器占用，从而研究资源平衡。","text":"卵石游戏（Pebble Game）"},{"isCorrect":false,"rationale":"图着色主要用于研究调度和分配问题，而非直接用于时空权衡的积不等式研究。","text":"图着色游戏"},{"isCorrect":false,"rationale":"这是研究电路复杂性的工具，而非 70 年代产生的专门用于时空权衡的模型。","text":"布尔电路博弈"},{"isCorrect":false,"rationale":"虽然计算复杂性中有博弈模型，但专门研究时空权衡的经典模型不是这个名称。","text":"分层游戏"}],"hint":"这个游戏的名称与一种可以在图的顶点上移动的小石子有关。","question":"在 20 世纪 70 年代，哪种游戏被开发出来用于研究算法中“空间”与“时间”的权衡（Tradeoffs）？"},{"answerOptions":[{"isCorrect":false,"rationale":"RAM 的基本命令中没有专门的清空命令，通常通过写入 0 或执行其他逻辑来实现。","text":"清空指定内存地址的数据内容"},{"isCorrect":false,"rationale":"这是指令循环的自动过程，而非 $READ$ 命令执行的具体数据操作。","text":"增加程序计数器（prog ctr）的值而不进行数据传输"},{"isCorrect":false,"rationale":"这是 $WRITE$ 命令的功能，而非 $READ$。","text":"将寄存器中的值写入指定地址的内存单元"},{"isCorrect":true,"rationale":"在 RAM 模型中，$READ$ 命令的作用是将特定地址的数据读取并反映在输出字中。","text":"将指定地址内存单元的值更改为输出数据字 $out\\ wrd$ 的值"}],"hint":"考虑数据是从内存流向 CPU 还是从 CPU 流向内存。","question":"在有界内存随机存取机（RAM）模型中，执行 $READ$ 命令会导致什么结果？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是整数加法的结果，没有考虑到模 5 的除余要求。","text":"$7$"},{"isCorrect":true,"rationale":"$3 + 4 = 7$，而 $7 \\div 5$ 的余数是 $2$，因此结果为 $2$。","text":"$2$"},{"isCorrect":false,"rationale":"模运算只有在和是 5 的倍数时结果才为 0。","text":"$0$"},{"isCorrect":false,"rationale":"这是 $(3 + 3) \\pmod 5$ 或类似运算的结果，而非 $3 \\oplus 4$。","text":"$1$"}],"hint":"将两数相加后求除以 5 的余数。","question":"假设集合 $S = \\{0, 1, 2, 3, 4\\}$，定义运算符 $\\oplus$ 为模 5 加法。计算 $3 \\oplus 4$ 的结果是多少？"},{"answerOptions":[{"isCorrect":false,"rationale":"机械计算机的历史要早得多，例如巴贝奇的差分机。","text":"第一台采用机械传动的计算机"},{"isCorrect":false,"rationale":"图形界面直到几十年后才由 Xerox PARC 等机构开发出来。","text":"第一台能够处理图形用户界面的计算机"},{"isCorrect":true,"rationale":"它被称为第一台存储程序计算机（SPC），标志着电子计算的新时代。","text":"第一台完全基于存储在内存中的指令运行的电子机器"},{"isCorrect":false,"rationale":"早期的曼彻斯特机器（如 Baby）仍主要基于电子管技术。","text":"第一台使用晶体管而非电子管的机器"}],"hint":"关键词是“存储程序计算机”（SPC）。","question":"曼彻斯特机器（Manchester Machine）在计算机历史上具有重要地位，因为它在 1948 年实现了什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"通过将 CPU 的所有逻辑电路放置在单个集成电路上，计算机变得普及和小型化。","text":"它允许以更低廉的价格和更小的体积制造计算机"},{"isCorrect":false,"rationale":"微处理器是核心处理单元，它不仅没有取代输入设备，反而促进了它们的多样化。","text":"它完全取代了所有类型的输入设备"},{"isCorrect":false,"rationale":"电子计算机始终需要电力来维持半导体逻辑电路的运行。","text":"它消除了计算机对电力供应的依赖"},{"isCorrect":false,"rationale":"这是软件和 AI 领域的挑战，而非微处理器硬件发明初期的直接功能。","text":"它使计算机能够直接理解人类的自然语言"}],"hint":"关注制造成本、物理尺寸以及普及程度的变化。","question":"微处理器的发明之所以具有革命性，其主要原因是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"4004 的时钟频率仅为 $108\\ kHz$，远低于 $100\\ MHz$。","text":"它的时钟频率达到了 $100\\ MHz$"},{"isCorrect":false,"rationale":"这描述是正确的，反映了 70 年代初期的集成度水平。","text":"它由大约 2,300 个晶体管组成"},{"isCorrect":false,"rationale":"这描述是正确的，4004 确实是作为一款 4 位处理器设计的。","text":"它是一个 4 位（4-bit）的 CPU"},{"isCorrect":false,"rationale":"正确，它是为 Busicom 公司开发的计算器核心。","text":"它最初是为日本的一家计算器公司设计的"}],"hint":"注意早期微处理器与现代处理器在频率单位上的巨大差异。","question":"Intel 4004 被认为是世界上第一款微处理器，关于它的描述错误的是？"},{"answerOptions":[{"isCorrect":false,"rationale":"Xerox Alto 是第一台展示现代 GUI 概念（如图标和鼠标）的机器。","text":"图形用户界面（GUI）"},{"isCorrect":false,"rationale":"这也是该中心开发的关键技术之一。","text":"激光打印机（Laser Printer）"},{"isCorrect":true,"rationale":"QWERTY 布局在 19 世纪机械打字机时代就已经产生，远早于 Xerox PARC。","text":"QWERTY 键盘布局"},{"isCorrect":false,"rationale":"以太网确实是 Xerox PARC 的重大发明之一。","text":"以太网（Ethernet）"}],"hint":"寻找一项与 19 世纪机械打字机相关的传统技术。","question":"根据来源材料，以下哪项不属于 Xerox PARC（施乐帕罗奥多研究中心）对现代计算的奠基性贡献？"},{"answerOptions":[{"isCorrect":false,"rationale":"“直接”指的是数据捕获方式，而非物理连接方式（无线设备也可以是直接输入的）。","text":"设备必须通过物理线缆直接连接到微处理器"},{"isCorrect":false,"rationale":"虽然计算机内部处理二进制，但输入设备可以捕获图像、条码或声音等多种形式。","text":"它们仅能识别二进制代码"},{"isCorrect":true,"rationale":"直接输入设备旨在提高自动化程度并减少人为错误。","text":"数据通过机器或设备直接获取，人的干预极少"},{"isCorrect":false,"rationale":"这是手动输入设备（如键盘）的特征。","text":"数据必须由操作员手动逐字敲击进入"}],"hint":"关注人类在数据录入过程中的参与程度。","question":"在输入设备分类中，“直接输入设备”（Direct input devices）的定义特征是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"通过更自然的形状减轻手腕和手的压力，从而预防长期劳损。","text":"减少与打字相关的健康问题（如重复性劳损 RSI）"},{"isCorrect":false,"rationale":"这是三防或防水键盘的设计重点。","text":"使键盘能够抵抗液体溅洒"},{"isCorrect":false,"rationale":"人体工程学键盘往往比标准键盘体积更大，因为需要额外的支撑和特定角度。","text":"减小键盘在桌面上的占地面积"},{"isCorrect":false,"rationale":"那是背光键盘的功能，而非人体工程学的主要目标。","text":"提高打字员在黑暗环境下的可见度"}],"hint":"考虑长期使用电脑办公对人体骨骼和肌肉的影响。","question":"人体工程学键盘（Ergonomic Keyboards）的设计初衷主要是为了解决什么问题？"},{"answerOptions":[{"isCorrect":false,"rationale":"恰恰相反，节省桌面空间是光笔的一个优点。","text":"在桌面空间有限的情况下无法使用"},{"isCorrect":false,"rationale":"来源材料指出光笔比鼠标更直接、更精确。","text":"比使用鼠标更不精确"},{"isCorrect":true,"rationale":"长时间保持这种姿势会导致手臂疲劳，这是人体工程学上的一个显著缺点。","text":"需要长时间抬起手对着屏幕，使用感不适"},{"isCorrect":false,"rationale":"光笔主要用于在屏幕上直接操作，非常适合图形交互。","text":"它无法在图形用户界面环境下工作"}],"hint":"想一想如果你必须连续几个小时抬高手臂指着墙壁会是什么感觉。","question":"关于“光笔”（Light Pen）这一输入设备，以下哪项描述是其缺点？"},{"answerOptions":[{"isCorrect":false,"rationale":"Altair 8800 最初主要通过开关和灯光进行交互，并未配备鼠标。","text":"1975 年，随 Altair 8800 一起面世"},{"isCorrect":false,"rationale":"费德里科·法金是微处理器的主要设计者，而非鼠标的初创者。","text":"1971 年，由 Federico Faggin 在 Intel 发明"},{"isCorrect":true,"rationale":"道格拉斯·恩格尔巴特在 1963 年左右发明了鼠标，并在 1970 年获得专利。","text":"1963 年（或 1967 年描述），由 Douglas Engelbart 发明"},{"isCorrect":false,"rationale":"曼彻斯特团队主要关注第一台 SPC 电子机器的实现。","text":"1948 年，由曼彻斯特大学团队发明"}],"hint":"发明者是来自斯坦福研究所（SRI）的一位先驱。","question":"根据材料，鼠标这种设备最初是在哪一年由谁发明的？"},{"answerOptions":[{"isCorrect":false,"rationale":"IBM PC 发布较晚（1981 年），虽然影响巨大，但不是第一款成功的家庭用户机。","text":"IBM PC"},{"isCorrect":false,"rationale":"Z80 是 CPU，虽然流行，但本身不是一款针对家庭用户的完整电脑产品名。","text":"Z80 嵌入式系统"},{"isCorrect":false,"rationale":"麦金塔发布于 1984 年，是以图形界面著称的后续机型。","text":"Macintosh"},{"isCorrect":true,"rationale":"它于 1975 年发布在《Popular Electronics》封面上，引发了个人电脑革命。","text":"Altair 8800"}],"hint":"它最初以整机套件（Kit）形式销售，其名字源自《星际迷航》。","question":"在 20 世纪 70 年代末到 80 年代，哪款电脑被视为第一款专门针对家庭用户且获得成功的微型计算机？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然现在有语音交互，但这不属于 GUI 的经典定义。","text":"仅通过语音指令控制"},{"isCorrect":false,"rationale":"这是早期计算机或底层开发的方式，不是 GUI 的核心特征。","text":"手动输入复杂的汇编代码"},{"isCorrect":true,"rationale":"GUI 的核心在于可视化交互，通过指向和点击（point and click）来发布指令。","text":"使用指针选择图标来执行任务"},{"isCorrect":false,"rationale":"这是早期大型机时代的交互方式。","text":"通过穿孔卡片进行批处理"}],"hint":"想一想现代 Windows 或 macOS 系统中最常见的操作动作。","question":"什么是“图形用户界面”（GUI）操作系统中输入命令的主要方式？"},{"answerOptions":[{"isCorrect":false,"rationale":"马佐尔是 Intel 的重要工程师，参与了 4004 项目，但未离职创办竞争公司。","text":"Stan Mazor"},{"isCorrect":false,"rationale":"泰德·霍夫是 4004 的主要构思者之一，但他没有创办 Zilog。","text":"Ted Hoff"},{"isCorrect":false,"rationale":"嶋正利最初是 Busicom 的代表，后来协助设计，但不是 Zilog 的创始人。","text":"Masatoshi Shima"},{"isCorrect":true,"rationale":"法金于 1974 年离开 Intel 并创办了 Zilog，Intel 后来在宣传中曾一度淡化他的贡献。","text":"Federico Faggin"}],"hint":"他的名字与 Intel 4004 的逻辑设计及后来的 Z80 密切相关。","question":"根据材料，Intel 的哪位设计师后来离开并创办了 Zilog 公司（Z80 的制造商）？"},{"answerOptions":[{"isCorrect":false,"rationale":"冷却系统是外部物理装置，无法集成在微米级的半导体内部。","text":"冷却系统"},{"isCorrect":false,"rationale":"电源管理虽然重要，但它是辅助电路，不属于 CPU 的逻辑核心。","text":"电源模块"},{"isCorrect":false,"rationale":"外部存储通常是独立的组件，而非微处理器芯片内部。","text":"外部存储器（硬盘）"},{"isCorrect":true,"rationale":"微处理器的核心是将中央处理单元的所有逻辑门和运算单元集成在一块芯片上。","text":"逻辑电路"}],"hint":"关键词是中央处理单元的核心组成部分。","question":"微处理器之所以被称为“单芯片计算机”，是因为它将 CPU 的所有什么放置在了单个集成电路上？"},{"answerOptions":[{"isCorrect":true,"rationale":"$NO\\text{-}OP$ 代表“No Operation”，即指令执行过程中不改变数据状态。","text":"不执行任何操作"},{"isCorrect":false,"rationale":"那是跳转或重置指令的功能。","text":"立即跳转到程序的起始位置"},{"isCorrect":false,"rationale":"停止指令（STOP）才会产生此效果，而不是 $NO\\text{-}OP$。","text":"停止 CPU 的时钟信号"},{"isCorrect":false,"rationale":"RAM 模型中没有这类一键清空的全局命令。","text":"清除整个 RAM 的内容"}],"hint":"其缩写代表“空操作”。","question":"在 RAM 模型中，$cmd$（命令）如果是 $NO\\text{-}OP$，会发生什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"打开的快捷键是 $Ctrl+O$。","text":"打开（Open）"},{"isCorrect":false,"rationale":"保存的快捷键是 $Ctrl+S$。","text":"保存（Save）"},{"isCorrect":false,"rationale":"粘贴的常用快捷键是 $Ctrl+V$。","text":"粘贴（Paste）"},{"isCorrect":true,"rationale":"$Ctrl+P$ 是调用系统打印对话框的标准快捷键。","text":"打印（Print）"}],"hint":"首字母 'P' 对应于纸张输出的动作。","question":"键盘快捷键 $Ctrl+P$ 通常在应用程序中用于什么功能？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是机械鼠标的特征，光学鼠标是非接触式的。","text":"它通过物理接触检测移动"},{"isCorrect":true,"rationale":"机械鼠标的滚轮和内部传感器极易受污垢影响，光学鼠标通过光反射避开了这一问题。","text":"它不容易因灰尘阻塞而影响精度"},{"isCorrect":false,"rationale":"普通光学鼠标在纯透明玻璃上反而难以工作，因为光无法有效反射。","text":"它只能在透明玻璃上工作"},{"isCorrect":false,"rationale":"机械鼠标通常也是有线的，不需要电池；优势不在于此。","text":"它不需要电池驱动"}],"hint":"考虑日常维护以及传感器的工作原理。","question":"光学鼠标（Optical Mouse）相比传统的机械（滚球）鼠标，其主要优势在于？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是麦克风作为输入设备的基本定义。","text":"将声音输入到数字计算机中"},{"isCorrect":true,"rationale":"这是手写板或 OCR 扫描仪的功能，麦克风捕获的是声音信号。","text":"直接将手写文字转换为电子文本"},{"isCorrect":false,"rationale":"录制旁白是麦克风的典型应用。","text":"在演示文稿中录制旁白"},{"isCorrect":false,"rationale":"网络语音通话是现代麦克风最重要的用途之一。","text":"通过互联网进行 VoIP 通话"}],"hint":"注意区分音频捕获和图形/文本捕获的区别。","question":"根据材料，麦克风（Microphone）在计算机系统中的主要用途不包括？"},{"answerOptions":[{"isCorrect":false,"rationale":"这属于语言学或自然语言处理，而非基础理论中的“形式语言”。","text":"英语或中文等自然语言"},{"isCorrect":false,"rationale":"这只是语法的一部分，不构成完整的计算模型。","text":"各种编程语言的关键字列表"},{"isCorrect":true,"rationale":"理论 CS 使用这些形式化的模型来研究计算的表达能力和复杂性。","text":"正则语言与上下文无关语言"},{"isCorrect":false,"rationale":"这是人机交互的文案，不是数学意义上的语言模型。","text":"图形用户界面中的提示语"}],"hint":"考虑自动机理论中对应的语言类别。","question":"理论计算机科学中，研究“语言”的模型主要指的是？"},{"answerOptions":[{"isCorrect":true,"rationale":"因为所有克隆机都需要运行兼容的操作系统，微软通过提供 DOS/Windows 极大地获益。","text":"微软（Microsoft）在软件市场取得了主导地位"},{"isCorrect":false,"rationale":"苹果在这一阶段保持了独立封闭的架构，未因 PC 克隆而获得主导权。","text":"苹果电脑成为了全球唯一的电脑供应商"},{"isCorrect":false,"rationale":"克隆机的普及带来了激烈竞争，导致电脑价格大幅下降。","text":"计算机的价格因缺乏竞争而大幅上涨"},{"isCorrect":false,"rationale":"事实恰恰相反，克隆机的出现让 IBM 失去了对该架构的控制权。","text":"IBM 巩固了其在微型计算机市场的绝对垄断"}],"hint":"考虑当众多硬件厂商生产相同的标准机器时，谁提供的软件变得不可或缺。","question":"在 IBM PC 的历史中，“克隆机（Clones）”的崛起导致了什么后果？"},{"answerOptions":[{"isCorrect":true,"rationale":"材料明确指出，1974 年发布的 8080 售价为 $360$。","text":"$360$"},{"isCorrect":false,"rationale":"这是当时杂志（如 Popular Electronics）的价格，而非 CPU 芯片的价格。","text":"$75\\ cents$"},{"isCorrect":false,"rationale":"虽然不便宜，但为了市场普及，其定价并未达到单片千元的水平。","text":"$1,000$"},{"isCorrect":false,"rationale":"早期的尖端微处理器远比这个价格昂贵。","text":"$10$"}],"hint":"这个数字恰好是一个圆周度数。","question":"Intel 8080 微处理器发布于 1974 年，其当时的售价约为多少？"},{"answerOptions":[{"isCorrect":false,"rationale":"图灵机被归类为“机器模型”，而非专门的程序系统模型。","text":"图灵机（Turing Machines）"},{"isCorrect":false,"rationale":"这属于数据库系统模型。","text":"面向对象数据库"},{"isCorrect":true,"rationale":"材料明确指出科学家为编译器和操作系统等系统级程序开发了模型。","text":"编译器与操作系统"},{"isCorrect":false,"rationale":"堆属于数据结构模型。","text":"堆（Heaps）"}],"hint":"寻找管理计算机硬件和其他程序的软件架构。","question":"根据材料，以下哪个计算机模型被列为专门研究“程序系统”的模型？"},{"answerOptions":[{"isCorrect":true,"rationale":"从键盘左上角第一行字母键开始，顺序依次是 Q-W-E-R-T-Y。","text":"键盘顶行前六个字母键的序列"},{"isCorrect":false,"rationale":"这是一个伪源头，QWERTY 实际上最初是为了防止机械打字机卡键而限制速度的设计。","text":"一个拉丁语词汇，意为“快速输入”"},{"isCorrect":false,"rationale":"它的排列是有意设计的物理布局，而非随机代码。","text":"由最初的一份专利代码随机生成的"},{"isCorrect":false,"rationale":"历史上并没有名为 Quinten Werty 的人发明键盘；布局是根据键位排列命名的。","text":"其发明者 Quinten Werty 的名字"}],"hint":"低头看看你电脑键盘左上角的字母排列。","question":"“QWERTY”键盘布局名称的由来是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"邻接表是图论中表示顶点及其连接边的一种标准模型。","text":"图（Graph）"},{"isCorrect":false,"rationale":"线性链表只表示单一的前后关系，不足以描述复杂的邻接集合。","text":"线性链表"},{"isCorrect":false,"rationale":"关系数据库通常使用表格形式的模型。","text":"关系数据库"},{"isCorrect":false,"rationale":"虽然神经网络也可以表示为图，但邻接表是更通用的数学图模型。","text":"多层神经网络"}],"hint":"它通过列出每个顶点连接到的其他顶点来表示结构。","question":"“邻接表”（Adjacency List）是理论计算机科学中描述哪种数据结构的模型？"}];
+        let currentIndex = 0;
+        let mode = 'quiz';
+        let state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+
+        function getStats() {
+            const answered = state.filter((s) => s.selectedIndex !== null).length;
+            const correct = state.filter((s, i) => s.selectedIndex !== null && quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const wrong = state.filter((s, i) => s.selectedIndex !== null && !quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const skipped = quizData.length - answered;
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { answered, correct, wrong, skipped, accuracy };
+        }
+
+        function shuffleAnswers() {
+            quizData.forEach((q) => {
+                for (let i = q.answerOptions.length - 1; i > 0; i -= 1) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.answerOptions[i], q.answerOptions[j]] = [q.answerOptions[j], q.answerOptions[i]];
+                }
+            });
+        }
+
+        function shuffleQuestions() {
+            for (let i = quizData.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+            }
+        }
+
+        function resetState() {
+            state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            const s = state[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            let optionsHtml = '';
+            const correctIndex = q.answerOptions.findIndex((o) => o.isCorrect);
+            const selectedCorrect = s.selectedIndex !== null && q.answerOptions[s.selectedIndex].isCorrect;
+            q.answerOptions.forEach((opt, idx) => {
+                const isSelected = s.selectedIndex === idx;
+                const statusClass = isSelected ? (opt.isCorrect ? 'correct' : 'incorrect') : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const revealCorrect = (s.selectedIndex !== null && !selectedCorrect && opt.isCorrect) || (mode === 'review' && opt.isCorrect);
+                const revealClass = revealCorrect ? 'revealed-correct' : '';
+
+                optionsHtml += `
+                    <li class="option-item ${selectedClass} ${statusClass} ${revealClass}" onclick="selectOption(${idx})">
+                        <div class="option-label">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                        </div>
+                        <div class="feedback-state">
+                            ${opt.isCorrect ? '✓ Right answer' : '✕ Not quite'}
+                        </div>
+                        ${opt.rationale ? '<div class="rationale">' + opt.rationale + '</div>' : ''}
+                    </li>
+                `;
+            });
+
+            const stats = getStats();
+
+            content.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-text">${currentIndex + 1} / ${quizData.length}</div>
+                    <div class="status-bar">
+                        <div class="status-item status-correct">
+                            <span>✓</span>
+                            <span>${stats.correct}</span>
+                        </div>
+                        <div class="status-item status-wrong">
+                            <span>✕</span>
+                            <span>${stats.wrong}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+            `;
+
+            // Update Hint Box
+            const hintText = document.getElementById('hint-text');
+            hintText.innerText = q.hint || 'No hint available for this question.';
+            if (s.hintVisible) {
+                hintBox.classList.add('active');
+            } else {
+                hintBox.classList.remove('active');
+            }
+
+            results.classList.add('hidden');
+            content.classList.remove('hidden');
+            hintBox.classList.remove('hidden');
+            nav.classList.remove('hidden');
+
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = false;
+            if (mode === 'review') {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Back to Results' : 'Next';
+            } else {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            }
+            document.getElementById('hint-icon-arrow').innerText = s.hintVisible ? '▲' : '▼';
+        }
+
+        function selectOption(idx) {
+            if (mode !== 'quiz') return;
+            if (state[currentIndex].selectedIndex !== null) return; // Prevent re-selection
+            state[currentIndex].selectedIndex = idx;
+            renderQuestion();
+        }
+
+        function toggleHint() {
+            if (mode === 'results') return;
+            state[currentIndex].hintVisible = !state[currentIndex].hintVisible;
+            renderQuestion();
+        }
+
+        function renderResults() {
+            const stats = getStats();
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+
+            const score = `${stats.correct} / ${quizData.length}`;
+
+            results.innerHTML = `
+                <div class="results-screen">
+                    <div>
+                        <h1 class="results-title">You did it! Quiz Complete.</h1>
+                        <p class="results-subtitle">Review your score or take another run.</p>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Score</div>
+                            <div class="result-value">${score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Accuracy</div>
+                            <div class="result-value">${stats.accuracy}%</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-metrics">
+                                <div>Right <strong>${stats.correct}</strong></div>
+                                <div>Wrong <strong>${stats.wrong}</strong></div>
+                                <div>Skipped <strong>${stats.skipped}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="review-btn" class="btn btn-ghost">Review Quiz</button>
+                        <button id="retake-btn" class="btn btn-next">Retake Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            content.classList.add('hidden');
+            results.classList.remove('hidden');
+            hintBox.classList.add('hidden');
+            nav.classList.add('hidden');
+
+            document.getElementById('review-btn').onclick = () => {
+                mode = 'review';
+                currentIndex = 0;
+                renderQuestion();
+            };
+
+            document.getElementById('retake-btn').onclick = () => {
+                mode = 'quiz';
+                currentIndex = 0;
+                shuffleQuestions();
+                shuffleAnswers();
+                resetState();
+                renderQuestion();
+            };
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (mode === 'review') {
+                if (currentIndex < quizData.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                } else {
+                    mode = 'results';
+                    renderResults();
+                }
+                return;
+            }
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                mode = 'results';
+                renderResults();
+            }
+        };
+
+        document.getElementById('hint-toggle').onclick = toggleHint;
+
+        renderQuestion();
+    </script>
+</body>
+</html>

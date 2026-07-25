@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大数据时代人工智能审计应用与前沿技术研究</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f6f1e7;
+            --bg-deep: #efe4d6;
+            --ink: #171717;
+            --muted: #5b5b5b;
+            --accent: #d3542c;
+            --accent-light: #ff8f5a;
+            --accent-dark: #b14320;
+            --teal: #1f6f78;
+            --card: #fff7ef;
+            --stroke: #e3d6c5;
+            --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
+            --space-1: 6px;
+            --space-2: 8px;
+            --space-3: 10px;
+            --space-4: 12px;
+            --space-5: 14px;
+            --space-6: 16px;
+            --space-7: 18px;
+            --space-8: 20px;
+            --space-9: 24px;
+            --space-10: 32px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --error: #b54832;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(240px 140px at 10% -10%, #ffd2b9 0%, transparent 70%),
+                radial-gradient(220px 160px at 90% 0%, #cfe7e6 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--space-10) var(--space-8);
+            box-sizing: border-box;
+            background: var(--card);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-text {
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct { color: var(--teal); }
+        .status-wrong { color: var(--error); }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item:hover:not(.selected) {
+            background-color: var(--card);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .option-item.selected.correct {
+            background-color: rgba(31, 111, 120, 0.12);
+            border-color: var(--teal);
+        }
+
+        .option-item.selected.incorrect {
+            background-color: rgba(181, 72, 50, 0.12);
+            border-color: var(--error);
+        }
+
+        .option-item.revealed-correct {
+            border-color: rgba(31, 111, 120, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(31, 111, 120, 0.16);
+        }
+
+        .option-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-state {
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .selected .feedback-state {
+            display: block;
+        }
+
+        .revealed-correct .feedback-state {
+            display: block;
+        }
+
+        .correct .feedback-state { color: var(--teal); }
+        .incorrect .feedback-state { color: var(--error); }
+        .revealed-correct .feedback-state { color: var(--teal); }
+
+        .rationale {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .selected .rationale {
+            display: block;
+        }
+
+        .revealed-correct .rationale {
+            display: block;
+        }
+        .hint-toggle {
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-6);
+            border-radius: var(--radius-md);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hint-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .hint-content {
+            margin-top: 32px;
+            padding: var(--space-6);
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            font-size: 0.95em;
+            color: var(--muted);
+            display: none;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .hint-content.active {
+            display: flex;
+        }
+
+        .hint-icon-box {
+            color: var(--accent-dark);
+            font-size: 1.2em;
+            margin-top: -2px;
+        }
+
+        .navigation {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-7);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-prev {
+            background-color: #fff;
+            color: var(--ink);
+            border-color: var(--stroke);
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: #fff;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .results-screen {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .results-title {
+            font-family: var(--font-display);
+            font-size: 2.1em;
+            margin: 0;
+        }
+
+        .results-subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .result-card {
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--stroke);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-family: var(--font-display);
+        }
+
+        .result-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid var(--stroke);
+            color: var(--ink);
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .quiz-container {
+                margin: var(--space-8);
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .quiz-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .option-item {
+                padding: var(--space-4);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                margin: var(--space-6);
+                padding: var(--space-7) var(--space-5);
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-4);
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hint-toggle {
+                justify-content: space-between;
+            }
+
+            .results-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-content">
+            <!-- Dynamic Content -->
+        </div>
+        <div id="results-content" class="hidden"></div>
+
+        <div id="hint-box" class="hint-content">
+            <div class="hint-icon-box">💡</div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="hint-toggle" class="hint-toggle">
+                <span>Hint</span>
+                <span id="hint-icon-arrow">▼</span>
+            </button>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-prev">Previous</button>
+                <button id="next-btn" class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [{"answerOptions":[{"isCorrect":false,"rationale":"大数据这个术语最早是在1990年代末期被提及的。具体来说，最早的相关使用出现在1997年左右，随着数据量的激增和数据处理技术的发展，“Big Data”逐渐成为描述海量、多样化数据集的术语。到了2005年左右，随着技术的成熟和应用的普及，这个概念开始广泛使用并受到关注。","text":"2000年代中期"},{"isCorrect":false,"rationale":"大数据这个术语最早是在1990年代末期被提及的。具体来说，最早的相关使用出现在1997年左右，随着数据量的激增和数据处理技术的发展，“Big Data”逐渐成为描述海量、多样化数据集的术语。到了2005年左右，随着技术的成熟和应用的普及，这个概念开始广泛使用并受到关注。","text":"2010年以后  "},{"isCorrect":true,"rationale":"大数据这个术语最早是在1990年代末期被提及的。具体来说，最早的相关使用出现在1997年左右，随着数据量的激增和数据处理技术的发展，“Big Data”逐渐成为描述海量、多样化数据集的术语。到了2005年左右，随着技术的成熟和应用的普及，这个概念开始广泛使用并受到关注。","text":"1990年代末期"},{"isCorrect":false,"rationale":"大数据这个术语最早是在1990年代末期被提及的。具体来说，最早的相关使用出现在1997年左右，随着数据量的激增和数据处理技术的发展，“Big Data”逐渐成为描述海量、多样化数据集的术语。到了2005年左右，随着技术的成熟和应用的普及，这个概念开始广泛使用并受到关注。","text":"1980年代初"}],"edited":true,"hint":"该术语在互联网快速发展和信息爆炸的背景下开始被提及。","imageUrls":[],"question":"大数据这个术语最早是在什么时候被提及的？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"资料中明确指出大数据的定义由这两位学者在2011年首次提出。","text":"2011 年"},{"isCorrect":false,"rationale":"2014年是大数据进入中国政府工作报告的年份，而非概念提出的初衷。","text":"2014 年"},{"isCorrect":false,"rationale":"1950年是阿兰·图灵提出机器思考问题的年份，而非大数据的概念起始。","text":"1950 年"},{"isCorrect":false,"rationale":"1936年是图灵机模型提出的年份，早于大数据概念几十年。","text":"1936 年"}],"hint":"这个年份通常被视为现代大数据理论的奠基时间。","question":"大数据的概念最早由维克托·迈尔——舍恩伯格和肯尼思·库克尔耶在何时提出？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"AI通过处理海量数据和自动识别风险，能有效改进传统审计方法的局限性。","text":"审计质量和效率"},{"isCorrect":false,"rationale":"AI是处理数据的手段，数据规模的增长源于社会数字化，而非AI工具本身。","text":"数据的原始规模"},{"isCorrect":false,"rationale":"审计AI的目标是优化审计流程，而非直接干预或提升被审计单位的财务表现。","text":"被审计单位的营业收入"},{"isCorrect":false,"rationale":"审计工作的核心是逻辑分析和风险评估，AI主要减轻脑力负担而非体力活动。","text":"审计人员的体力活动"}],"hint":"考虑技术手段对专业工作流程的最直接益处。","question":"人工智能（AI）在审计工作中能够显著提升什么？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"由于数据规模和复杂度呈指数级上升，传统方法已难以应对大数据时代的审计需求。","text":"传统的人工审计方法"},{"isCorrect":false,"rationale":"深度学习正是为了在大数据中识别模式而设计的先进手段。","text":"深度学习算法"},{"isCorrect":false,"rationale":"分布式存储是解决海量数据存储的方案，属于技术支持层。","text":"分布式存储技术"},{"isCorrect":false,"rationale":"云计算是应对大数据挑战的工具，而非面临挑战而难以胜任的方法。","text":"云端自动化处理"}],"hint":"思考在数据量激增的情况下，哪种依赖人力的方法效率最低。","question":"在大数据背景下，哪种数据处理方法面临挑战？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"现代硬件通常能提供极快的计算速度，主要瓶颈在于安全、可靠性和人才。","text":"计算速度过慢"},{"isCorrect":true,"rationale":"审计涉及敏感信息，AI对大量数据的依赖增加了隐私泄露和安全风险。","text":"数据安全与隐私保护"},{"isCorrect":false,"rationale":"AI的引入通常需要投资，其挑战不在于取消费用，而在于技术的应用成本和风险管理。","text":"审计费用全面取消"},{"isCorrect":false,"rationale":"互联网普及是现状，虽然是基础设施需求，但并非AI特有的主要挑战。","text":"互联网连接的缺失"}],"hint":"考虑在处理企业或国家敏感财务数据时最令人担忧的合规性问题。","question":"在实际审计中，人工智能面临的重大挑战之一是什么？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这是一种基本的排序算法，用于组织数据顺序，而非挖掘深层规律。","text":"Quicksort 算法"},{"isCorrect":false,"rationale":"这是图论中寻找最短路径的经典算法，与审计中的数据挖掘目的不同。","text":"Dijkstra 算法"},{"isCorrect":false,"rationale":"BP神经网络主要用于预测和分类，而非通过迭代发现项集间的关联规则。","text":"BP 神经网络"},{"isCorrect":true,"rationale":"Apriori算法通过迭代计算发现数据集中频繁出现的关联规则，是审计中关联规则挖掘的常用方法。","text":"Apriori 算法"}],"hint":"这种算法的名字在数据挖掘领域非常知名，常用于超市购物篮分析。","question":"审计数据分析中，用于寻找频繁项集关联规则的常用算法是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"聚类分析是识别和分类风险的工具，修正工作仍需审计人员核实后进行。","text":"直接修正错误的记账凭证"},{"isCorrect":true,"rationale":"聚类分析能将相似特征的项归类，帮助审计人员发现异常交易或潜在欺诈行为。","text":"识别数据集中的相似项并分类"},{"isCorrect":false,"rationale":"聚类是为了分析数据而非简单的数据清理或删除。","text":"删除所有不活跃的数据库记录"},{"isCorrect":false,"rationale":"字数统计是简单的文本操作，不需要聚类分析这种复杂的数据挖掘技术。","text":"计算审计报告的字数"}],"hint":"思考将没有预先定义标签的数据进行分组的技术。","question":"聚类分析在审计数据分析中的主要作用是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"异常检测关注的是“不正常”的数据，而非为所有数据提供绝对合法的证明。","text":"证明所有交易都是合法的"},{"isCorrect":false,"rationale":"异常检测旨在提高效率，减少对合规数据的盲目检查，从而节省时间。","text":"增加审计工作的总耗时"},{"isCorrect":false,"rationale":"异常检测提供线索，但最终判断是否属于风险仍需人类专业经验。","text":"完全取代人类审计师的判断"},{"isCorrect":true,"rationale":"通过分析数据中的异常波动或异常值，审计人员能锁定高风险区域。","text":"识别潜在错误、欺诈或风险"}],"hint":"这是关于在海量账目中寻找“害群之马”的过程。","question":"异常检测在审计中的意义是什么？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"审计计划是对审计工作的安排，不具备干预被审计单位人事结构的职权。","text":"更换被审计单位的管理层"},{"isCorrect":false,"rationale":"审计报告是流程的最后一步成果，不能在计划阶段就打印。","text":"立即打印审计报告"},{"isCorrect":false,"rationale":"智能审计强调风险导向而非完全随机，盲目选择会降低审计有效性。","text":"随机选择检查的科目"},{"isCorrect":true,"rationale":"制定有效计划必须以了解业务和风险为基础，AI可以加速这一过程的数据收集。","text":"调查了解被审计单位的业务性质和风险状况"}],"hint":"在做任何专业安排前，必须先进行必要的背景调查和风险评估。","question":"在智能审计流程中，审计计划制定的第一步通常涉及？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"通过分析历史数据，系统可提供预设的审计计划模型，从而节省人力。","text":"自动生成审计计划模板"},{"isCorrect":false,"rationale":"审计是监督过程，并非干扰业务运行的强制停工手段。","text":"强制锁定所有的会计软件"},{"isCorrect":false,"rationale":"审计是法律和制度要求，AI只能优化过程，不能取消法定审计。","text":"取消所有的年度审计要求"},{"isCorrect":false,"rationale":"实地考察往往需要人类感官和现场沟通，目前AI尚不能完全替代这类物理现场工作。","text":"代替审计人员进行实地考察"}],"hint":"考虑自动化工具如何减少从零开始撰写文档的时间。","question":"智能审计系统如何减轻审计人员在计划阶段的工作量？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"强化学习的核心是智能体在环境中通过不断试错和反馈信号来优化其决策策略。","text":"试错机制（Hit-and-trial mechanisms）"},{"isCorrect":false,"rationale":"学习过程需要智能体与环境产生交互，纯观察无法完成强化学习循环。","text":"仅观察而不采取任何行动"},{"isCorrect":false,"rationale":"那是监督学习的特征，强化学习并不主要依赖带标签的数据集。","text":"预先标记好的海量标签"},{"isCorrect":false,"rationale":"AI的优势在于自主学习，过度依赖人工指令则违背了自主优化的初衷。","text":"人类逐条输入的指令"}],"hint":"这种方式类似于动物或人类通过经历失败和成功来积累经验的过程。","question":"强化学习（Reinforcement Learning）中，智能体通过什么进行自学以获得最大奖励？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这是系统硬件监控的任务，与AI算法的问题建模无关。","text":"计算 GPU 的核心温度"},{"isCorrect":false,"rationale":"MDP是算法层面的逻辑框架，不属于物理硬件部件。","text":"物理机器人的硬件接口"},{"isCorrect":false,"rationale":"MDP属于数学决策模型，与网络通信或数据存储的加密协议无关。","text":"作为唯一的加密协议"},{"isCorrect":true,"rationale":"MDP为强化学习提供了一个数学框架，用于定义状态、动作、奖励和转移概率。","text":"进行问题表述（Issue formulation）"}],"hint":"它是一种数学框架，用于描述决策者在不确定环境下的行为模型。","question":"在强化学习中，马尔可夫决策过程（MDP）的作用是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这些是机械设备的部件名，而非神经网络的专用架构术语。","text":"加速器与制动器"},{"isCorrect":true,"rationale":"GANs通过一个尝试生成逼真数据的网络和一个尝试区分真假的网络之间的对抗来训练。","text":"生成器与判别器"},{"isCorrect":false,"rationale":"这是冯·诺依曼架构的基本组成，不具备生成模型特有的对抗逻辑。","text":"存储单元与运算单元"},{"isCorrect":false,"rationale":"这些是网络通信模型中的层级，而非专门用于生成对抗训练的组件。","text":"输入层与物理层"}],"hint":"考虑一个试图伪造艺术品的人与一个试图识别真伪的专家之间的博弈。","question":"生成对抗网络（GANs）由两部分组成，分别是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"迁移学习允许模型将在一个任务中学到的知识应用到相关但不同的新任务中。","text":"在训练数据不足或难以重新收集时利用已有知识"},{"isCorrect":false,"rationale":"这里的“迁移”是指知识的跨领域应用，而非物体的空间移动。","text":"如何将纸质凭证物理搬运到办公室"},{"isCorrect":false,"rationale":"这超出了计算机科学和生物工程的技术范畴。","text":"让电脑学会像植物一样光合作用"},{"isCorrect":false,"rationale":"迁移学习能提高效率，但无法彻底消除计算过程中的能量消耗。","text":"完全消除所有的计算功耗"}],"hint":"想想如何借鉴之前的成功经验来处理当前的新情况。","question":"迁移学习（Transfer Learning）主要解决的问题是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"微调通过调整预训练模型的权重以更好地适配特定任务的细节。","text":"取消冻结部分预训练层并在目标数据集上进行训练"},{"isCorrect":false,"rationale":"微调是为了保留和优化现有的知识，而非销毁层级。","text":"删除所有现有的神经网络层"},{"isCorrect":false,"rationale":"微调必须建立在已有的预训练权重基础上，而非从随机初始化开始。","text":"只使用未经处理的原始随机数据"},{"isCorrect":false,"rationale":"虽然也叫微调，但在机器学习中，这指的是模型权重的精细化调整。","text":"减小电脑主机的风扇转速"}],"hint":"这是一种在现有基础模型上进行“量体裁衣”式的适应性调整。","question":"迁移学习中的“微调（Fine-tuning）”是指？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"图表显示该技术属于远期（>4年），属于未来一代的硬件技术。","text":"神经形态计算 (Neuromorphic Computing)"},{"isCorrect":false,"rationale":"这被分类在需要 4 年以上才能成熟的技术景观中。","text":"机器人个人助理 (Robotic Personal Assistants)"},{"isCorrect":true,"rationale":"根据 Callaghan Innovation 的图表，机器学习是目前已经成熟并广泛应用的技术之一。","text":"机器学习 (Machine Learning)"},{"isCorrect":false,"rationale":"这通常属于 2-4 年内的技术成熟预期范畴。","text":"自动手术机器人 (Autonomous Surgical Robotics)"}],"hint":"寻找那些已经在现代企业应用（如 Xero 的自动化记账）中投入使用的技术。","question":"根据 AI 技术全景图，哪项技术被标记为“当前（Now）”且已就绪？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"翻译是 NLP 的另一分支，情感分析侧重于态度的挖掘。","text":"翻译不同语言之间的语法结构"},{"isCorrect":false,"rationale":"这属于硬件故障诊断，不属于自然语言理解的范畴。","text":"分析硬盘驱动器的机械震动"},{"isCorrect":false,"rationale":"单词本身没有物理重量，情感分析属于语义层面的理解。","text":"计算单词在字典中的物理重量"},{"isCorrect":true,"rationale":"情感分析旨在让系统识别文本或对话中的褒贬或特定的情绪状态。","text":"理解所言所语背后的情绪倾向"}],"hint":"考虑电脑如何判断一条用户评价是好评还是差评。","question":"自然语言处理（NLP）中的“情感分析（Sentiment Analysis）”是指？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"图表将其标记为远期技术，尚未在消费电子产品中大规模普及。","text":"目前在所有智能手机中普遍存在"},{"isCorrect":false,"rationale":"它指的是特殊的硬件集成电路，而非纯手工运算。","text":"只能通过纸笔运算的数学方法"},{"isCorrect":false,"rationale":"它通常是在硅芯片上实现的，只是设计架构模仿了大脑。","text":"不使用任何硅材料的机械计算机"},{"isCorrect":true,"rationale":"这种硬件致力于在硅芯片上模拟生物神经网络的运作方式。","text":"模仿人脑功能的未来一代计算硬件"}],"hint":"这是一种在物理结构上就致力于像“电子大脑”一样的硬件革新。","question":"神经形态计算（Neuromorphic Computing）的特点是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"弱AI仅仅是表现得像有智慧，但不具备真正的自我意识或对意义的理解。","text":"能够模拟部分人类智能，执行特定任务但无意识"},{"isCorrect":false,"rationale":"那通常对应强人工智能或“超人工智能”的概念。","text":"完全超越人类智力的超级电脑"},{"isCorrect":false,"rationale":"弱AI可以非常复杂（如AlphaGo），其“弱”体现在缺乏意识而非计算能力低。","text":"只能进行一位数加法的计算器"},{"isCorrect":false,"rationale":"这是所有电子设备的基本属性，而非 AI 强弱分类的哲学标准。","text":"没有电就无法启动的机器"}],"hint":"这是一种侧重于“做”而非“懂”的智能分类。","question":"约翰·塞尔（John Searle）在 1980 年提出的“强人工智能”与“弱人工智能”概念中，弱 AI 是指？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"快AI倾向于模式识别和快速反应，类似于人类无需深思熟虑的直觉。","text":"系统从示例中学习并利用直觉/记忆"},{"isCorrect":false,"rationale":"这与人类认知的心理模型不符，这里的“快”指认知反应模式。","text":"电脑关机时的处理速度"},{"isCorrect":false,"rationale":"那是“慢AI（Thinking Slow）”的特征，侧重于安全性和解释性。","text":"使用严密的符号逻辑进行推理"},{"isCorrect":false,"rationale":"虽然快思考可能出错，但其定义在于高效的启发式直觉学习。","text":"随机产生错误答案的过程"}],"hint":"对应我们脱口而出“2 + 2 = 4”这种不需要刻意思考的反应。","question":"丹尼尔·卡尼曼描述的“快思考（Thinking Fast）”在 AI 系统中对应什么？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这低估了生物大脑的极端复杂性。","text":"只有百分之一"},{"isCorrect":false,"rationale":"人工网络目前的复杂度远未达到生物大脑的水平。","text":"恰好一倍"},{"isCorrect":true,"rationale":"根据资料图示，人脑拥有约 $10^{15}$ 突触，比现有人工网络规模大几个数量级。","text":"一千多万倍"},{"isCorrect":false,"rationale":"突触规模的差距是指数级的，而非简单的个位数倍数。","text":"不到十倍"}],"hint":"人工网络与生物大脑在连接密度上存在着天壤之别。","question":"在生物与人工神经网络的比较中，人脑的突触数量大约是 ResNet-152 网络的多少倍？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这是科幻或魔术手法，不属于人工智能的技术实现。","text":"其内部真的寄宿着一个微型人类"},{"isCorrect":true,"rationale":"资料指出，Sophia使用视觉数据处理模仿 gesti umano，给人以理解对话的假象。","text":"模仿人类手势和面部表情，并回答预定义主题"},{"isCorrect":false,"rationale":"它具备一定的视觉交互和逻辑匹配，而非纯粹的随机播放。","text":"完全随机地播放预录音轨"},{"isCorrect":false,"rationale":"目前的对话机器人通常通过语音识别和文本处理工作，而非物理脑电接口。","text":"通过物理线缆直接读取人类的大脑电波"}],"hint":"它的设计初衷是作为服务于医疗或客户支持的“社交机器人”。","question":"Sophia 机器人（2020）主要通过什么方式来创造具备对话能力的错觉？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"条形码仅包含药品信息，无法反映病人个体的生理风险特征。","text":"药瓶的条形码"},{"isCorrect":false,"rationale":"收费清单反映经济活动，眼底照片才包含生理和病理信息。","text":"医院的收费清单"},{"isCorrect":false,"rationale":"鞋码与心血管健康没有已知的医疗统计相关性。","text":"病人的鞋码"},{"isCorrect":true,"rationale":"深度学习可以从眼底扫描中获得年龄、血压、吸烟习惯等预测因子。","text":"眼底照片 (Retinal fundus photographs)"}],"hint":"这种方法被称为“眼底是全身健康的窗口”。","question":"在医院应用场景中，AI 可以通过扫描什么来预测心血管疾病风险？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这属于生活技能缺失，并非她作为伦理学家关注的核心学术课题。","text":"AI 无法制作好喝的咖啡"},{"isCorrect":false,"rationale":"这是视光学问题，而非 AI 的伦理和社会影响研究。","text":"电脑屏幕会导致近视"},{"isCorrect":false,"rationale":"她关注的是 AI 的偏见、不平等等负面风险，而非电力经济效益。","text":"AI 可能会让电费下降"},{"isCorrect":true,"rationale":"她在学术论文中对大规模语言模型等技术的伦理隐患提出了批判。","text":"AI 使用中的伦理、技术和社会批判性问题"}],"hint":"她曾是 Google AI 伦理团队的联合负责人。","question":"伦理学家 Timnit Gebru 曾因指出 AI 的哪些问题而引起广泛关注？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"灾区和核电站事故现场显然不是用于娱乐社交的场景。","text":"举办盛大的派对"},{"isCorrect":false,"rationale":"这涉及违反物理规律的幻想，而非 AI 的实际功能。","text":"让时间倒流到灾难发生前"},{"isCorrect":true,"rationale":"机器人可以在高辐射或废墟等人类难以进入的危险区域进行探测和作业。","text":"在危险环境下执行任务"},{"isCorrect":false,"rationale":"AI目前只能协助清理或探测，物理上的核辐射消除仍是极大的难题。","text":"完全消除核辐射"}],"hint":"考虑机器在那些“人类禁区”中的替代作用。","question":"资料中提到的切尔诺贝利和地震灾区展示了 AI 在哪方面的应用？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"出于责任和准确性考虑，生成的报告仍需专业人员核实签发。","text":"自动生成的报告不需要人类审核"},{"isCorrect":false,"rationale":"审计报告必须遵循法律和专业准则，AI 只是执行工具而非立法者。","text":"AI 可以完全独立于法律框架编写报告"},{"isCorrect":true,"rationale":"系统可以基于审计过程中的发现自动填充部分内容，减少重复劳动。","text":"AI 可以使报告生成过程更加自动化和高效"},{"isCorrect":false,"rationale":"资料提到技术可靠性是挑战，AI 可能由于训练数据偏差产生错误结论。","text":"AI 永远不会在报告中出错"}],"hint":"思考自动化工具如何缩短从数据发现到形成文稿的周期。","question":"关于审计流程智能化中的“审计报告生成”，以下描述正确的是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":true,"rationale":"由于数据来源广泛且杂乱，需要通过挖掘技术剔除大量噪音才能找到价值点。","text":"在海量数据中，有用的关键信息占比相对较小"},{"isCorrect":false,"rationale":"这是硬件成本问题，价值密度指的是信息量与数据总量的比例。","text":"硬盘本身的市场价格非常便宜"},{"isCorrect":false,"rationale":"这是一种完全不恰当的比喻，与数据的本质特征无关。","text":"数据可以像黄金一样被融化"},{"isCorrect":false,"rationale":"安全性与价值密度是两个独立的概念，密度低反而增加了筛选的安全成本。","text":"所有数据的安全性都极高"}],"hint":"类似于在一座巨大的沙山中寻找几颗散落的珍珠。","question":"大数据面临的“价值密度低”特点是指？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"机器学习的目标是有目的地优化模型，而非盲目随机动作。","text":"纯随机学习"},{"isCorrect":false,"rationale":"人类的学习方式多样，包括模仿、直觉等，不仅限于简单的输入输出对。","text":"人类大脑的唯一学习方式"},{"isCorrect":true,"rationale":"监督学习通过标注好的数据对，让系统学习输入到输出的映射关系。","text":"监督学习 (Supervised learning)"},{"isCorrect":false,"rationale":"无监督学习在没有预定义输出标签的情况下寻找数据中的模式。","text":"无监督学习 (Unsupervised learning)"}],"hint":"这就像有一位老师在旁边，针对每个练习题给出了正确答案供学生参考。","question":"机器学习中，如果系统给出了已知输入并被告知了期望输出，这属于？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这主要用于 NLP 领域的情感分析，而非图像数字识别。","text":"IMDb 影评库"},{"isCorrect":false,"rationale":"这属于地理空间数据，不是用于基础手写识别训练的图像集。","text":"Google Maps 导航记录"},{"isCorrect":false,"rationale":"这是足球领域的排名，与字符图像识别无关。","text":"FIFA 排行榜"},{"isCorrect":true,"rationale":"根据资料引文，MNIST是深度学习中用于手写体数字识别的经典数据库。","text":"MNIST 数据库"}],"hint":"这是一个包含成千上万个由人类书写的 0 到 9 数字图像的集合。","question":"在智能手机应用中，识别手写数字的常见数据集名称是？","type":"multiple_choice"},{"answerOptions":[{"isCorrect":false,"rationale":"这属于开发模式的选择，而非伦理道德的基本原则。","text":"所有代码必须由 AI 自动生成"},{"isCorrect":true,"rationale":"欧盟强调 AI 必须是以人为本且符合核心价值观的。","text":"尊重人类尊严、自由、民主与公正"},{"isCorrect":false,"rationale":"伦理准则明确强调尊重个人权利，而非盲目追求效率。","text":"效率至上，可以牺牲个人隐私"},{"isCorrect":false,"rationale":"AI 的应用是全方位的，伦理准则旨在规范所有领域的使用。","text":"只允许在军事领域使用 AI"}],"hint":"这些原则与现代文明社会的基本人权保障是一致的。","question":"根据“欧盟伦理准则（2019）”，AI 的发展应遵循什么原则？","type":"multiple_choice"}];
+        let currentIndex = 0;
+        let mode = 'quiz';
+        let state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+
+        function getStats() {
+            const answered = state.filter((s) => s.selectedIndex !== null).length;
+            const correct = state.filter((s, i) => s.selectedIndex !== null && quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const wrong = state.filter((s, i) => s.selectedIndex !== null && !quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const skipped = quizData.length - answered;
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { answered, correct, wrong, skipped, accuracy };
+        }
+
+        function shuffleAnswers() {
+            quizData.forEach((q) => {
+                for (let i = q.answerOptions.length - 1; i > 0; i -= 1) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.answerOptions[i], q.answerOptions[j]] = [q.answerOptions[j], q.answerOptions[i]];
+                }
+            });
+        }
+
+        function shuffleQuestions() {
+            for (let i = quizData.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+            }
+        }
+
+        function resetState() {
+            state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            const s = state[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            let optionsHtml = '';
+            const correctIndex = q.answerOptions.findIndex((o) => o.isCorrect);
+            const selectedCorrect = s.selectedIndex !== null && q.answerOptions[s.selectedIndex].isCorrect;
+            q.answerOptions.forEach((opt, idx) => {
+                const isSelected = s.selectedIndex === idx;
+                const statusClass = isSelected ? (opt.isCorrect ? 'correct' : 'incorrect') : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const revealCorrect = (s.selectedIndex !== null && !selectedCorrect && opt.isCorrect) || (mode === 'review' && opt.isCorrect);
+                const revealClass = revealCorrect ? 'revealed-correct' : '';
+
+                optionsHtml += `
+                    <li class="option-item ${selectedClass} ${statusClass} ${revealClass}" onclick="selectOption(${idx})">
+                        <div class="option-label">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                        </div>
+                        <div class="feedback-state">
+                            ${opt.isCorrect ? '✓ Right answer' : '✕ Not quite'}
+                        </div>
+                        ${opt.rationale ? '<div class="rationale">' + opt.rationale + '</div>' : ''}
+                    </li>
+                `;
+            });
+
+            const stats = getStats();
+
+            content.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-text">${currentIndex + 1} / ${quizData.length}</div>
+                    <div class="status-bar">
+                        <div class="status-item status-correct">
+                            <span>✓</span>
+                            <span>${stats.correct}</span>
+                        </div>
+                        <div class="status-item status-wrong">
+                            <span>✕</span>
+                            <span>${stats.wrong}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+            `;
+
+            // Update Hint Box
+            const hintText = document.getElementById('hint-text');
+            hintText.innerText = q.hint || 'No hint available for this question.';
+            if (s.hintVisible) {
+                hintBox.classList.add('active');
+            } else {
+                hintBox.classList.remove('active');
+            }
+
+            results.classList.add('hidden');
+            content.classList.remove('hidden');
+            hintBox.classList.remove('hidden');
+            nav.classList.remove('hidden');
+
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = false;
+            if (mode === 'review') {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Back to Results' : 'Next';
+            } else {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            }
+            document.getElementById('hint-icon-arrow').innerText = s.hintVisible ? '▲' : '▼';
+        }
+
+        function selectOption(idx) {
+            if (mode !== 'quiz') return;
+            if (state[currentIndex].selectedIndex !== null) return; // Prevent re-selection
+            state[currentIndex].selectedIndex = idx;
+            renderQuestion();
+        }
+
+        function toggleHint() {
+            if (mode === 'results') return;
+            state[currentIndex].hintVisible = !state[currentIndex].hintVisible;
+            renderQuestion();
+        }
+
+        function renderResults() {
+            const stats = getStats();
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+
+            const score = `${stats.correct} / ${quizData.length}`;
+
+            results.innerHTML = `
+                <div class="results-screen">
+                    <div>
+                        <h1 class="results-title">You did it! Quiz Complete.</h1>
+                        <p class="results-subtitle">Review your score or take another run.</p>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Score</div>
+                            <div class="result-value">${score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Accuracy</div>
+                            <div class="result-value">${stats.accuracy}%</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-metrics">
+                                <div>Right <strong>${stats.correct}</strong></div>
+                                <div>Wrong <strong>${stats.wrong}</strong></div>
+                                <div>Skipped <strong>${stats.skipped}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="review-btn" class="btn btn-ghost">Review Quiz</button>
+                        <button id="retake-btn" class="btn btn-next">Retake Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            content.classList.add('hidden');
+            results.classList.remove('hidden');
+            hintBox.classList.add('hidden');
+            nav.classList.add('hidden');
+
+            document.getElementById('review-btn').onclick = () => {
+                mode = 'review';
+                currentIndex = 0;
+                renderQuestion();
+            };
+
+            document.getElementById('retake-btn').onclick = () => {
+                mode = 'quiz';
+                currentIndex = 0;
+                shuffleQuestions();
+                shuffleAnswers();
+                resetState();
+                renderQuestion();
+            };
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (mode === 'review') {
+                if (currentIndex < quizData.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                } else {
+                    mode = 'results';
+                    renderResults();
+                }
+                return;
+            }
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                mode = 'results';
+                renderResults();
+            }
+        };
+
+        document.getElementById('hint-toggle').onclick = toggleHint;
+
+        renderQuestion();
+    </script>
+</body>
+</html>

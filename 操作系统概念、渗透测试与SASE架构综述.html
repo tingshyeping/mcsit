@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作系统概念、渗透测试与SASE架构综述</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f6f1e7;
+            --bg-deep: #efe4d6;
+            --ink: #171717;
+            --muted: #5b5b5b;
+            --accent: #d3542c;
+            --accent-light: #ff8f5a;
+            --accent-dark: #b14320;
+            --teal: #1f6f78;
+            --card: #fff7ef;
+            --stroke: #e3d6c5;
+            --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
+            --space-1: 6px;
+            --space-2: 8px;
+            --space-3: 10px;
+            --space-4: 12px;
+            --space-5: 14px;
+            --space-6: 16px;
+            --space-7: 18px;
+            --space-8: 20px;
+            --space-9: 24px;
+            --space-10: 32px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --error: #b54832;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(240px 140px at 10% -10%, #ffd2b9 0%, transparent 70%),
+                radial-gradient(220px 160px at 90% 0%, #cfe7e6 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--space-10) var(--space-8);
+            box-sizing: border-box;
+            background: var(--card);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-text {
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct { color: var(--teal); }
+        .status-wrong { color: var(--error); }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item:hover:not(.selected) {
+            background-color: var(--card);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .option-item.selected.correct {
+            background-color: rgba(31, 111, 120, 0.12);
+            border-color: var(--teal);
+        }
+
+        .option-item.selected.incorrect {
+            background-color: rgba(181, 72, 50, 0.12);
+            border-color: var(--error);
+        }
+
+        .option-item.revealed-correct {
+            border-color: rgba(31, 111, 120, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(31, 111, 120, 0.16);
+        }
+
+        .option-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-state {
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .selected .feedback-state {
+            display: block;
+        }
+
+        .revealed-correct .feedback-state {
+            display: block;
+        }
+
+        .correct .feedback-state { color: var(--teal); }
+        .incorrect .feedback-state { color: var(--error); }
+        .revealed-correct .feedback-state { color: var(--teal); }
+
+        .rationale {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .selected .rationale {
+            display: block;
+        }
+
+        .revealed-correct .rationale {
+            display: block;
+        }
+        .hint-toggle {
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-6);
+            border-radius: var(--radius-md);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hint-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .hint-content {
+            margin-top: 32px;
+            padding: var(--space-6);
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            font-size: 0.95em;
+            color: var(--muted);
+            display: none;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .hint-content.active {
+            display: flex;
+        }
+
+        .hint-icon-box {
+            color: var(--accent-dark);
+            font-size: 1.2em;
+            margin-top: -2px;
+        }
+
+        .navigation {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-7);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-prev {
+            background-color: #fff;
+            color: var(--ink);
+            border-color: var(--stroke);
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: #fff;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .results-screen {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .results-title {
+            font-family: var(--font-display);
+            font-size: 2.1em;
+            margin: 0;
+        }
+
+        .results-subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .result-card {
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--stroke);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-family: var(--font-display);
+        }
+
+        .result-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid var(--stroke);
+            color: var(--ink);
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .quiz-container {
+                margin: var(--space-8);
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .quiz-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .option-item {
+                padding: var(--space-4);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                margin: var(--space-6);
+                padding: var(--space-7) var(--space-5);
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-4);
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hint-toggle {
+                justify-content: space-between;
+            }
+
+            .results-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-content">
+            <!-- Dynamic Content -->
+        </div>
+        <div id="results-content" class="hidden"></div>
+
+        <div id="hint-box" class="hint-content">
+            <div class="hint-icon-box">💡</div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="hint-toggle" class="hint-toggle">
+                <span>Hint</span>
+                <span id="hint-icon-arrow">▼</span>
+            </button>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-prev">Previous</button>
+                <button id="next-btn" class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [{"answerOptions":[{"isCorrect":false,"rationale":"虽然云服务涉及这些领域，但 SASE 专门针对网络架构和边缘安全。","text":"数据库管理与前端设计"},{"isCorrect":true,"rationale":"SASE 的核心定义就是将网络连接性（如 SD-WAN）与安全服务（如 FWaaS）整合在一起。","text":"网络功能与安全功能"},{"isCorrect":false,"rationale":"SASE 关注的是网络资源的连接与保护，而非产品的生产周期。","text":"硬件制造与软件开发"},{"isCorrect":false,"rationale":"这些是企业管理功能，与网络安全架构无关。","text":"人力资源管理与财务审计"}],"hint":"思考网络连接和保护数字资源这两个基本组成部分。","question":"根据 Hughes 的指南，SASE (Secure Access Service Edge) 将哪两个主要功能统一到单一的云原生服务模式中？"},{"answerOptions":[{"isCorrect":false,"rationale":"密码破解通常由 hashcat 等工具负责。","text":"破解复杂的加密散列"},{"isCorrect":true,"rationale":"Nmap 是业界公认的用于识别网络主机和开放端口的标准工具。","text":"端口扫描与网络发现"},{"isCorrect":false,"rationale":"这是 sqlmap 等专门工具的功能，而非通用的网络扫描器。","text":"自动化执行 SQL 注入"},{"isCorrect":false,"rationale":"报告编写通常由专门的文档工具或文字处理器完成，而非扫描工具。","text":"编写最终测试报告"}],"hint":"它用于探测网络中哪些主机是活跃的以及它们提供了什么服务。","question":"在渗透测试中，Nmap 工具主要用于执行以下哪项任务？"},{"answerOptions":[{"isCorrect":false,"rationale":"进程是软件层面的抽象概念，而非物理硬件的连接标准。","text":"一种物理硬件接口协议"},{"isCorrect":false,"rationale":"静态文件是程序代码，而进程代表的是代码的动态执行状态。","text":"一种永久存储的静态数据文件"},{"isCorrect":false,"rationale":"进程是所有现代操作系统（包括桌面和服务器）的基本概念。","text":"仅限移动设备的应用程序"},{"isCorrect":true,"rationale":"操作系统通过管理这些执行中的工作单元来实现多任务处理。","text":"系统中的一个工作单元"}],"hint":"考虑系统正在执行的动态任务单位。","question":"根据《操作系统概念》一书，现代操作系统中的“进程”通常被定义为什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这正是传统网络模型的弱点，零信任旨在消除这种默认假设。","text":"信任所有内部网络用户"},{"isCorrect":true,"rationale":"ZTNA 要求无论用户身处何处，在授予访问权限前都必须持续验证身份和上下文。","text":"从不信任，始终验证"},{"isCorrect":false,"rationale":"ZTNA 是一种逻辑访问控制模型，不受物理边界的限制。","text":"仅依靠物理防火墙保护"},{"isCorrect":false,"rationale":"零信任强调持续验证，而非一次性授权。","text":"一旦登录即获得永久访问权"}],"hint":"这个名称本身就暗示了其对“信任”的态度。","question":"零信任网络访问 (ZTNA) 的核心原则是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"涌现性描述了整体表现出其组成部分所不具备的新特性的现象。","text":"由于简单的个体相互作用产生的复杂集体行为"},{"isCorrect":false,"rationale":"涌现关注的是宏观层面的新特征，而非微观层面的局部失效。","text":"系统内单个部件的故障模式"},{"isCorrect":false,"rationale":"涌现通常与非线性和不可预测的行为相关联。","text":"完全可以预测的线性增长模型"},{"isCorrect":false,"rationale":"这通常被称为系统退化或老化，而非涌现。","text":"系统性能随时间逐渐下降的现象"}],"hint":"考虑整体大于部分之和的概念。","question":"在复杂系统科学中，圣菲研究所提到的“涌现性 (Emergence)”是指什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"无线流量监视通常使用 Aircrack-ng 等工具。","text":"监视局域网内的所有无线流量"},{"isCorrect":true,"rationale":"该工具专门用于测试数据库驱动的 Web 应用程序中的注入点。","text":"自动检测并利用 SQL 注入漏洞"},{"isCorrect":false,"rationale":"sqlmap 是安全测试工具，不具备网页设计功能。","text":"设计网站的图形界面"},{"isCorrect":false,"rationale":"它是渗透测试工具，而非杀毒软件。","text":"清理计算机系统中的病毒"}],"hint":"它的名字暗示了它针对的是结构化查询语言相关的数据库。","question":"渗透测试工具 sqlmap 的主要用途是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这与情报收集的定义不符。","text":"高级网络流量检测 (Official Scanner for Internet Network Traffic)"},{"isCorrect":false,"rationale":"虽然缩写字母相同，但在安全领域中这不是标准术语。","text":"操作系统内部测试 (Operating System Internal Test)"},{"isCorrect":false,"rationale":"这并不是该缩写公认的含义。","text":"在线安全整合工具 (Online Security Integration Tool)"},{"isCorrect":true,"rationale":"OSINT 是通过收集公开可用的信息来源来进行调查和分析的过程。","text":"开源情报 (Open Source Intelligence)"}],"hint":"它是关于利用搜索引擎、社交媒体和其他公开资源获取信息。","question":"根据“Advanced Penetration Testing”课程大纲，OSINT 代表什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"SD-WAN 是 SASE 的网络基础，允许根据条件（如带宽需求）智能路由流量。","text":"优化和简化广域网的管理，实现流量智能路由"},{"isCorrect":false,"rationale":"SD-WAN 是软件定义的网络层，运行在各种现有的物理连接之上。","text":"物理连接数据中心的专用光缆"},{"isCorrect":false,"rationale":"SD-WAN 是一种网络技术，而非终端保护软件。","text":"作为一种纯粹的防病毒软件"},{"isCorrect":false,"rationale":"它的重点是数据传输的路径选择和管理，而非静态存储。","text":"仅用于存储大型数据库备份"}],"hint":"它关注的是“软件定义”如何改进传统的广域网连接。","question":"在 SASE 架构中，SD-WAN 的作用是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然它有此类功能，但这远非它的主要用途。","text":"仅用于生成随机密码字典"},{"isCorrect":false,"rationale":"渗透测试关注逻辑漏洞而非物理破坏。","text":"直接通过暴力手段破坏物理服务器"},{"isCorrect":false,"rationale":"这属于操作系统内部功能，不属于 Web 安全测试工具的范畴。","text":"取代操作系统内核的任务调度器"},{"isCorrect":true,"rationale":"Burp Suite 的核心是一个代理服务器，允许安全人员通过该代理操控 HTTP 流量。","text":"拦截、检查和修改浏览器与服务器之间的流量"}],"hint":"想象它是一个位于你的浏览器和目标网站之间的“检查站”。","question":"什么是 Burp Suite 在 Web 应用程序渗透测试中的主要功能？"},{"answerOptions":[{"isCorrect":true,"rationale":"POSIX (可移植操作系统接口) 定义了一套标准，使应用程序可以跨多个合规系统运行。","text":"在 UNIX 及其衍生系统之间提供可移植的接口规范"},{"isCorrect":false,"rationale":"虽然 Windows 可以支持 POSIX，但 Windows 的主要开发环境是 Windows API。","text":"作为 Windows 操作系统的唯一开发标准"},{"isCorrect":false,"rationale":"POSIX 关注的是系统调用接口，而非特定的图形性能。","text":"提高所有图形化游戏的运行速度"},{"isCorrect":false,"rationale":"这是一个物理学难题，超出了软件标准的范畴。","text":"消除计算机系统对电源的需求"}],"hint":"重点在于它的名称中的“可移植性” (Portable)。","question":"《操作系统概念》提到的 POSIX 标准主要旨在实现什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"CASB 提供对云应用的可见性和控制，确保合规性和数据安全。","text":"作为云用户与服务提供商之间的中介，监控云应用的使用"},{"isCorrect":false,"rationale":"CASB 的设计初衷之一是支持各种地点和设备访问云服务。","text":"强制用户必须使用本地办公设备"},{"isCorrect":false,"rationale":"虽然可能涉及数据丢失预防，但其主要任务是管理云服务的访问控制。","text":"自动拦截所有发往外部的电子邮件"},{"isCorrect":false,"rationale":"这属于设施管理，不属于云访问安全代理的范畴。","text":"直接管理物理数据中心的所有空调系统"}],"hint":"它位于用户和云服务之间，充当“守门人”的角色。","question":"CASB (Cloud Access Security Broker) 在 SASE 模型中如何发挥作用？"},{"answerOptions":[{"isCorrect":true,"rationale":"易学易用的特性加上专门针对渗透测试和自动化的强大库，使其成为首选。","text":"因为它语法简洁，且拥有丰富的网络和安全库"},{"isCorrect":false,"rationale":"Python 的多功能性使其在网络安全领域大放异彩。","text":"因为它只能用于编写文字处理软件"},{"isCorrect":false,"rationale":"这显然是不正确的，编程语言有很多种。","text":"因为它是世界上唯一的编程语言"},{"isCorrect":false,"rationale":"所有编程语言都必须在硬件和操作系统上运行。","text":"因为它不需要计算机硬件即可运行"}],"hint":"考虑该语言的易用性以及它所支持的工具生态系统。","question":"为什么 Python 被 InfosecTrain 描述为“黑客的最爱”？"},{"answerOptions":[{"isCorrect":true,"rationale":"执行摘要旨在以非技术语言快速概括风险和业务影响。","text":"公司的高层管理人员和决策者"},{"isCorrect":false,"rationale":"他们更需要详细的技术细节，而非高层级的摘要。","text":"负责修复代码的初级程序员"},{"isCorrect":false,"rationale":"这会造成严重的机密泄露。","text":"竞争对手公司的安全部门"},{"isCorrect":false,"rationale":"渗透报告通常是受限访问的内部文档。","text":"所有普通网络用户"}],"hint":"考虑那些需要了解风险大图但不需要知道具体代码错误的管理者。","question":"在渗透测试报告中，“执行摘要 (Executive Summary)”的主要读者通常是谁？"},{"answerOptions":[{"isCorrect":false,"rationale":"防火墙的核心就是应用预定义的安全策略来过滤流量。","text":"FWaaS 完全不需要定义任何安全规则"},{"isCorrect":false,"rationale":"它处理逻辑网络流量，不限传输介质。","text":"FWaaS 只能保护通过物理光纤传输的数据"},{"isCorrect":false,"rationale":"FWaaS 是一种云服务，而非个人计算机硬件。","text":"FWaaS 必须安装在每个用户的电脑机箱内"},{"isCorrect":true,"rationale":"与部署在特定位置的传统防火墙不同，FWaaS 能够随着用户和应用的位置灵活扩展。","text":"FWaaS 是由云端交付的服务，可跨组织网络应用保护"}],"hint":"考虑云交付方式与固定地点硬件的区别。","question":"SASE 中的“FWaaS” (Firewall as a Service) 与传统防火墙有何不同？"},{"answerOptions":[{"isCorrect":false,"rationale":"随机因素的存在使得系统行为难以精确预测。","text":"随机性 (Randomness)"},{"isCorrect":false,"rationale":"非线性使得系统输出与输入不成比例，增加了理解的难度。","text":"非线性 (Nonlinearity)"},{"isCorrect":false,"rationale":"系统的不同层级之间存在复杂的交互作用。","text":"分层结构 (Hierarchy)"},{"isCorrect":true,"rationale":"复杂系统通常不是直截了当或线性的，这正是它们“隐身”的原因。","text":"简单的直线型逻辑"}],"hint":"寻找一个描述过于简单、不属于复杂系统特征的选项。","question":"根据圣菲研究所的观点，以下哪项不是隐藏复杂系统现象的典型原因？"},{"answerOptions":[{"isCorrect":false,"rationale":"工具的使用仍然需要深入的专业知识和背景积累。","text":"它会自动将普通用户升级为网络安全专家"},{"isCorrect":true,"rationale":"Metasploit 整合了漏洞研究、载荷选择和后渗透功能。","text":"它提供了一个标准化的平台来开发和执行利用代码"},{"isCorrect":false,"rationale":"虽然工具可以被滥用，但其专业设计目的是用于合法的安全评估。","text":"它可以帮助用户完全合法地窃取他人的银行密码"},{"isCorrect":false,"rationale":"它的关注点是软件利用和系统验证，而非物理维护。","text":"它能防止计算机硬件出现任何物理损坏"}],"hint":"思考它在整合漏洞利用过程中所起的作用。","question":"Metasploit 框架在安全专家中被广泛使用，其主要原因是："},{"answerOptions":[{"isCorrect":false,"rationale":"这是财务决策，而非操作系统内核的功能。","text":"减少购买计算机所需的财务预算"},{"isCorrect":false,"rationale":"RAM 是现代计算机架构不可或缺的组成部分。","text":"彻底消除操作系统对 RAM 的依赖"},{"isCorrect":true,"rationale":"有效的管理可以优化资源分配，提高系统响应速度。","text":"提高 CPU 利用率，确保多个进程能同时驻留在内存中"},{"isCorrect":false,"rationale":"本地系统需要内存来运行，且管理关注的是分配而非放弃控制权。","text":"将计算机的所有物理内存永久捐赠给云端"}],"hint":"考虑系统如何平衡多个程序对有限空间的竞相使用。","question":"《操作系统概念》中提到的“内存管理”的主要目的是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"SASE 的本质是云交付的网络服务，网络连接是前提条件。","text":"托管服务完全不需要任何网络连接"},{"isCorrect":false,"rationale":"无流量意味着网络服务不再发挥作用。","text":"保证系统永远不会产生任何网络流量"},{"isCorrect":true,"rationale":"通过外包管理，企业可以获得比内部团队更专业的持续监控和技术专长。","text":"利用提供商的 24/7 监控和专业安全技能"},{"isCorrect":false,"rationale":"安全服务旨在抵御威胁，而非改变攻击者的动机。","text":"托管模式可以自动将所有对手变成朋友"}],"hint":"考虑全天候支持和专业团队带来的保障。","question":"什么是托管 SASE (Managed SASE) 优于自行维护模式 (DIY) 的主要优势之一？"},{"answerOptions":[{"isCorrect":true,"rationale":"Aircrack-ng 是一个无线网络审计工具套件，涉及数据包截获和破解。","text":"无线网络（如 Wi-Fi）协议"},{"isCorrect":false,"rationale":"这属于物理安全范畴，而非网络协议评估。","text":"物理围栏和监控摄像头"},{"isCorrect":false,"rationale":"这是基础设施运维关注的内容。","text":"大型云服务器的物理制冷效率"},{"isCorrect":false,"rationale":"这是会计审计的工作，与 IT 安全工具无关。","text":"公司财务报表的准确性"}],"hint":"它与你家里的路由器和 Wi-Fi 信号有关。","question":"在渗透测试中，Aircrack-ng 工具主要用于评估什么类型的安全性？"},{"answerOptions":[{"isCorrect":false,"rationale":"它们是具有实际影响力、可感知的实体。","text":"纯粹的人造幻觉"},{"isCorrect":true,"rationale":"这些系统表现出非线性、反馈循环和自组织等复杂系统的典型特征。","text":"复杂系统 (Complex Systems)"},{"isCorrect":false,"rationale":"由于内部存在大量相互作用的元素，它们不可能是孤立的。","text":"简单的孤立物体"},{"isCorrect":false,"rationale":"这些系统内部存在明确的交互逻辑和结构。","text":"没有任何联系的随机数字"}],"hint":"考虑多学科背景下对这类具有动态集体行为的实体的统称。","question":"根据圣菲研究所的描述，城市和经济系统被视为什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"侦察是获取信息的基础，不能在结束后才进行。","text":"在测试完全结束后生成账单时"},{"isCorrect":false,"rationale":"这时进行的是验证扫描或回归测试，而非初始侦察。","text":"在管理员修复所有漏洞之后"},{"isCorrect":true,"rationale":"这个阶段通过各种手段尽可能多地收集目标系统的信息。","text":"在攻击实施的最早期阶段"},{"isCorrect":false,"rationale":"侦察是发现漏洞的前提，而非结果。","text":"仅在发现第一个致命漏洞时"}],"hint":"它是信息收集的起始点。","question":"渗透测试中的“Reconnaissance (侦察)”阶段通常发生在什么时候？"},{"answerOptions":[{"isCorrect":true,"rationale":"细粒度控制意味着可以灵活决定用户在应用中能做什么，而不只是允许或禁止进入。","text":"能够控制特定应用内特定功能的访问，如只读不写"},{"isCorrect":false,"rationale":"这是不良网络环境的副作用，而非安全功能的目标。","text":"让所有网站的加载速度都变得极其缓慢"},{"isCorrect":false,"rationale":"这是密码策略，不是 Web 网关提供的针对云应用的流量控制。","text":"强制所有员工必须每五分钟更换一次密码"},{"isCorrect":false,"rationale":"安全控制的目的是保护工作，而非停止工作。","text":"彻底禁止员工使用任何计算机设备"}],"hint":"细粒度意味着管理的精度非常高，不仅限于“是”或“否”。","question":"在 SASE 中，SWG (Secure Web Gateway) 提供的“云应用细粒度控制”是指什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这与计算机系统的逻辑或物理安全性无关。","text":"鼠标垫的清洁程度"},{"isCorrect":false,"rationale":"这是硬件物理保护，通常不包含在 OS 的软件安全性定义中。","text":"物理显示器的玻璃表面"},{"isCorrect":true,"rationale":"安全性涉及保护资源不受未经授权的访问、恶意破坏或意外修改。","text":"系统存储信息（数据和代码）的完整性"},{"isCorrect":false,"rationale":"这完全超出了计算机科学的研究范围。","text":"办公室盆栽植物的生长周期"}],"hint":"关注系统中保存的数据不被乱动或偷看。","question":"《操作系统概念》将“安全性 (Security)”定义为主要保护什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"PoC 必须具有展示特定漏洞存在性的实际意义。","text":"向客户展示一段毫无意义的代码"},{"isCorrect":true,"rationale":"PoC 是漏洞存在且有风险的实际演示，帮助技术团队重现问题。","text":"证明发现的漏洞确实可以被利用"},{"isCorrect":false,"rationale":"PoC 是技术证明，盈利取决于商业模式。","text":"自动为公司赚取巨额利润"},{"isCorrect":false,"rationale":"PoC 目的是逻辑层面的风险确认，而非硬件破坏。","text":"将目标系统彻底从物理上焚毁"}],"hint":"它是“证明给我看”阶段所提供的证据。","question":"在渗透测试报告中，提供“概念验证 (Proof of Concept, PoC)”的主要目的是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"科学方法同样适用于观察身边那些“隐藏在众目睽睽之下”的复杂系统。","text":"一种仅适用于远距离星体观测的技术"},{"isCorrect":true,"rationale":"它通过仪器和严密的逻辑来辅助人们理解那些难以直观感知的规律。","text":"克服个体智慧局限，发现基本机制的工具集"},{"isCorrect":false,"rationale":"科学方法的目的是发现真理，而非形式主义的堆砌。","text":"仅仅是为了让论文看起来更长的一种手段"},{"isCorrect":false,"rationale":"科学方法强调严谨的工具、形式化和实验实践。","text":"一种完全靠直觉猜谜的游戏"}],"hint":"思考科学如何作为人类感官和认知的增强器。","question":"根据圣菲研究所，科学方法在研究复杂系统时扮演的角色是："},{"answerOptions":[{"isCorrect":true,"rationale":"S3 桶如果权限设置过于宽松，会导致敏感数据泄露给互联网上的任何人。","text":"配置不当导致的公开访问漏洞"},{"isCorrect":false,"rationale":"这类硬件细节在虚拟化的 S3 服务中是不可见的。","text":"CPU 风扇的转速调节"},{"isCorrect":false,"rationale":"云租户通常无法访问物理机柜，其责任在于逻辑访问控制。","text":"物理机柜的锁定装置"},{"isCorrect":false,"rationale":"云环境下这由 AWS 平台方负责，用户只需关注逻辑层面的设置。","text":"服务器电源插头的松动情况"}],"hint":"考虑由于简单的“允许所有人访问”设置所带来的数据风险。","question":"在 AWS 渗透测试大纲中，测试 S3 桶主要关注哪方面的安全？"},{"answerOptions":[{"isCorrect":false,"rationale":"虽然可以如此使用，但其工具集是专门为安全设计的。","text":"作为日常办公和玩游戏的首选系统"},{"isCorrect":false,"rationale":"它主要运行在 PC、虚拟机或基于 ARM 的设备上。","text":"仅限在非电脑设备上运行的操作系统"},{"isCorrect":false,"rationale":"系统管理员可以根据需要自由安装或删除软件。","text":"专门用于防止任何软件被卸载的系统"},{"isCorrect":true,"rationale":"Kali Linux 预装了数百个专门用于分析、破解和利用系统的工具。","text":"用于渗透测试和进攻性安全评估的操作系统"}],"hint":"它是专为那些想通过测试系统弱点来增强安全性的专家准备的。","question":" Kali Linux 的主要定位是："}];
+        let currentIndex = 0;
+        let mode = 'quiz';
+        let state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+
+        function getStats() {
+            const answered = state.filter((s) => s.selectedIndex !== null).length;
+            const correct = state.filter((s, i) => s.selectedIndex !== null && quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const wrong = state.filter((s, i) => s.selectedIndex !== null && !quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const skipped = quizData.length - answered;
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { answered, correct, wrong, skipped, accuracy };
+        }
+
+        function shuffleAnswers() {
+            quizData.forEach((q) => {
+                for (let i = q.answerOptions.length - 1; i > 0; i -= 1) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.answerOptions[i], q.answerOptions[j]] = [q.answerOptions[j], q.answerOptions[i]];
+                }
+            });
+        }
+
+        function shuffleQuestions() {
+            for (let i = quizData.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+            }
+        }
+
+        function resetState() {
+            state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            const s = state[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            let optionsHtml = '';
+            const correctIndex = q.answerOptions.findIndex((o) => o.isCorrect);
+            const selectedCorrect = s.selectedIndex !== null && q.answerOptions[s.selectedIndex].isCorrect;
+            q.answerOptions.forEach((opt, idx) => {
+                const isSelected = s.selectedIndex === idx;
+                const statusClass = isSelected ? (opt.isCorrect ? 'correct' : 'incorrect') : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const revealCorrect = (s.selectedIndex !== null && !selectedCorrect && opt.isCorrect) || (mode === 'review' && opt.isCorrect);
+                const revealClass = revealCorrect ? 'revealed-correct' : '';
+
+                optionsHtml += `
+                    <li class="option-item ${selectedClass} ${statusClass} ${revealClass}" onclick="selectOption(${idx})">
+                        <div class="option-label">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                        </div>
+                        <div class="feedback-state">
+                            ${opt.isCorrect ? '✓ Right answer' : '✕ Not quite'}
+                        </div>
+                        ${opt.rationale ? '<div class="rationale">' + opt.rationale + '</div>' : ''}
+                    </li>
+                `;
+            });
+
+            const stats = getStats();
+
+            content.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-text">${currentIndex + 1} / ${quizData.length}</div>
+                    <div class="status-bar">
+                        <div class="status-item status-correct">
+                            <span>✓</span>
+                            <span>${stats.correct}</span>
+                        </div>
+                        <div class="status-item status-wrong">
+                            <span>✕</span>
+                            <span>${stats.wrong}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+            `;
+
+            // Update Hint Box
+            const hintText = document.getElementById('hint-text');
+            hintText.innerText = q.hint || 'No hint available for this question.';
+            if (s.hintVisible) {
+                hintBox.classList.add('active');
+            } else {
+                hintBox.classList.remove('active');
+            }
+
+            results.classList.add('hidden');
+            content.classList.remove('hidden');
+            hintBox.classList.remove('hidden');
+            nav.classList.remove('hidden');
+
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = false;
+            if (mode === 'review') {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Back to Results' : 'Next';
+            } else {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            }
+            document.getElementById('hint-icon-arrow').innerText = s.hintVisible ? '▲' : '▼';
+        }
+
+        function selectOption(idx) {
+            if (mode !== 'quiz') return;
+            if (state[currentIndex].selectedIndex !== null) return; // Prevent re-selection
+            state[currentIndex].selectedIndex = idx;
+            renderQuestion();
+        }
+
+        function toggleHint() {
+            if (mode === 'results') return;
+            state[currentIndex].hintVisible = !state[currentIndex].hintVisible;
+            renderQuestion();
+        }
+
+        function renderResults() {
+            const stats = getStats();
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+
+            const score = `${stats.correct} / ${quizData.length}`;
+
+            results.innerHTML = `
+                <div class="results-screen">
+                    <div>
+                        <h1 class="results-title">You did it! Quiz Complete.</h1>
+                        <p class="results-subtitle">Review your score or take another run.</p>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Score</div>
+                            <div class="result-value">${score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Accuracy</div>
+                            <div class="result-value">${stats.accuracy}%</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-metrics">
+                                <div>Right <strong>${stats.correct}</strong></div>
+                                <div>Wrong <strong>${stats.wrong}</strong></div>
+                                <div>Skipped <strong>${stats.skipped}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="review-btn" class="btn btn-ghost">Review Quiz</button>
+                        <button id="retake-btn" class="btn btn-next">Retake Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            content.classList.add('hidden');
+            results.classList.remove('hidden');
+            hintBox.classList.add('hidden');
+            nav.classList.add('hidden');
+
+            document.getElementById('review-btn').onclick = () => {
+                mode = 'review';
+                currentIndex = 0;
+                renderQuestion();
+            };
+
+            document.getElementById('retake-btn').onclick = () => {
+                mode = 'quiz';
+                currentIndex = 0;
+                shuffleQuestions();
+                shuffleAnswers();
+                resetState();
+                renderQuestion();
+            };
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (mode === 'review') {
+                if (currentIndex < quizData.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                } else {
+                    mode = 'results';
+                    renderResults();
+                }
+                return;
+            }
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                mode = 'results';
+                renderResults();
+            }
+        };
+
+        document.getElementById('hint-toggle').onclick = toggleHint;
+
+        renderQuestion();
+    </script>
+</body>
+</html>

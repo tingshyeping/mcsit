@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知识库导航 · 学习中心</title>
+  <!-- Font & minimal reset -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'KaiTi', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f6f5f2;
+      background-image: radial-gradient(circle at 0% 0%, #f0ede8 0%, #e8e3dc 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      color: #1e1b18;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(255, 252, 248, 0.55);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2.2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      border: 1px solid rgba(255, 245, 235, 0.7);
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #2d2a24;
+      margin-bottom: 0.25rem;
+    }
+
+    .subhead {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #5f5a52;
+      margin-bottom: 2.5rem;
+      border-left: 4px solid #c9b9a8;
+      padding-left: 1rem;
+      background: rgba(235, 225, 215, 0.3);
+      border-radius: 0 8px 8px 0;
+      display: inline-block;
+      padding: 0.4rem 1.2rem;
+      backdrop-filter: blur(2px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .card {
+      background: #fefcf9;
+      border-radius: 1.8rem;
+      padding: 1.8rem 1.5rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 0 0 1px #e7dfd6;
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      backdrop-filter: blur(2px);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -10px rgba(60, 45, 35, 0.12), 0 0 0 1px #dacfc2;
+      border-color: #d6c8b8;
+      background: #fffcf8;
+    }
+
+    .card-icon {
+      font-size: 2.2rem;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .card-icon span {
+      background: #ece5dc;
+      border-radius: 40px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4d443b;
+      letter-spacing: 0.02em;
+    }
+
+    .card h3 {
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: -0.01em;
+      color: #2b251f;
+      margin-bottom: 0.4rem;
+    }
+
+    .card p {
+      color: #5b534a;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+      flex: 1;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.6rem;
+      margin-top: 0.2rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #ede8e1;
+      color: #4f463c;
+      padding: 0.2rem 0.7rem;
+      border-radius: 40px;
+      letter-spacing: 0.01em;
+      border: 1px solid #ddd3c7;
+    }
+
+    .card-link {
+      display: inline-block;
+      margin-top: 1rem;
+      background: #1e1b18;
+      color: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 60px;
+      text-decoration: none;
+      align-self: flex-start;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      background: #2f2a24;
+      letter-spacing: 0.01em;
+    }
+
+    .card-link:hover {
+      background: #14110e;
+      transform: scale(0.97);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-link i {
+      margin-right: 6px;
+    }
+
+    .card-special {
+      background: #f3ede6;
+      border-color: #d7cbbc;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      color: #6a6259;
+      font-size: 0.8rem;
+      text-align: center;
+      border-top: 1px solid #ddd5cb;
+      padding-top: 2rem;
+      letter-spacing: 0.01em;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer span {
+      opacity: 0.7;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 1.8rem 1rem;
+        border-radius: 2rem;
+      }
+      h1 {
+        font-size: 1.9rem;
+      }
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1>
+          <span>📚</span> 知识库 · 导航
+        </h1>
+        <div class="subhead">
+          🧭 选择下方卡片，快速跳转至对应学习模块
+        </div>
+      </div>
+      <div style="background: #dacfc2; padding: 0.3rem 1rem; border-radius: 60px; font-size: 0.75rem; color: #3d352d; font-weight: 500; backdrop-filter: blur(4px); background: rgba(210, 196, 180, 0.5);">
+        ⚡ 共 8 个独立页面
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- 卡片 1 -->
+      <div class="card">
+        <div class="card-icon">
+          💻 <span>ASK</span>
+        </div>
+        <h3>初一基础电脑科学</h3>
+        <p>KSSM ASK Tingkatan 1 · 计算思维、数据表示、算法与 Python / HTML 讲义 + 题库</p>
+        <div class="card-tags">
+          <span class="tag">Bab 1-4</span>
+          <span class="tag">复习</span>
+          <span class="tag">练习</span>
+        </div>
+        <a href="Notes.html" class="card-link">📖 打开讲义</a>
+      </div>
+
+      <!-- 卡片 2 -->
+      <div class="card">
+        <div class="card-icon">
+          🤖 <span>AI</span>
+        </div>
+        <h3>人工智能审计应用</h3>
+        <p>大数据时代 · 智能审计、机器学习、NLP、GANs、伦理与前沿技术全景</p>
+        <div class="card-tags">
+          <span class="tag">大数据</span>
+          <span class="tag">审计</span>
+          <span class="tag">前沿</span>
+        </div>
+        <a href="大数据时代人工智能审计应用与前沿技术研究.html" class="card-link">📊 进入研究</a>
+      </div>
+
+      <!-- 卡片 3 -->
+      <div class="card">
+        <div class="card-icon">
+          🖥️ <span>OS</span>
+        </div>
+        <h3>操作系统·渗透·SASE</h3>
+        <p>操作系统概念、渗透测试、SASE 架构 — 综合问答与复习 (含 2 个变体版本)</p>
+        <div class="card-tags">
+          <span class="tag">操作系统</span>
+          <span class="tag">渗透</span>
+          <span class="tag">SASE</span>
+        </div>
+        <a href="操作系统概念、渗透测试与SASE架构综述.html" class="card-link">🔐 打开综述</a>
+      </div>
+
+      <!-- 卡片 4 (第二个变体) -->
+      <div class="card">
+        <div class="card-icon">
+          🧩 <span>v2</span>
+        </div>
+        <h3>OS · 渗透 · SASE (第二版)</h3>
+        <p>相同主题的备用问答版本，内容略有扩充，适合反复练习</p>
+        <div class="card-tags">
+          <span class="tag">变体</span>
+          <span class="tag">巩固</span>
+        </div>
+        <a href="操作系统概念、渗透测试与SASE架构综述 (2).html" class="card-link">📂 打开第二版</a>
+      </div>
+
+      <!-- 卡片 5 -->
+      <div class="card">
+        <div class="card-icon">
+          ⚙️ <span>μP</span>
+        </div>
+        <h3>微处理器与PC发展史</h3>
+        <p>从 Z3、ENIAC 到 Intel 4004、8080，个人计算机的诞生与演进</p>
+        <div class="card-tags">
+          <span class="tag">硬件</span>
+          <span class="tag">历史</span>
+          <span class="tag">CPU</span>
+        </div>
+        <a href="微处理器与个人计算机发展史.html" class="card-link">🕰️ 查看历史</a>
+      </div>
+
+      <!-- 卡片 6 (第二个版本) -->
+      <div class="card">
+        <div class="card-icon">
+          📟 <span>v2</span>
+        </div>
+        <h3>微处理器发展史 (第二版)</h3>
+        <p>补充问答与细节，涵盖更多早期计算机里程碑</p>
+        <div class="card-tags">
+          <span class="tag">扩展</span>
+          <span class="tag">练习</span>
+        </div>
+        <a href="微处理器与个人计算机发展史（3）.html" class="card-link">🔁 打开第二版</a>
+      </div>
+
+      <!-- 卡片 7 -->
+      <div class="card card-special">
+        <div class="card-icon">
+          📘 <span>百科</span>
+        </div>
+        <h3>计算机基础知识百科</h3>
+        <p>ALU、DMA、MMIO、冯·诺依曼、深度学习、密码学基础 · 问答合集</p>
+        <div class="card-tags">
+          <span class="tag">基础</span>
+          <span class="tag">体系结构</span>
+          <span class="tag">面试</span>
+        </div>
+        <a href="计算机基础知识百科全书.html" class="card-link">📚 进入百科</a>
+      </div>
+
+      <!-- 卡片 8 (第二版百科) -->
+      <div class="card card-special">
+        <div class="card-icon">
+          📖 <span>v2</span>
+        </div>
+        <h3>计算机百科 (补充卷)</h3>
+        <p>扩展题库：溢出标志、触发器、SATA Express、P2DR 模型等</p>
+        <div class="card-tags">
+          <span class="tag">进阶</span>
+          <span class="tag">硬件</span>
+          <span class="tag">安全</span>
+        </div>
+        <a href="计算机基础知识百科全书（2）.html" class="card-link">📑 打开补充卷</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>📁 所有页面均为独立 HTML · 点击即跳转</span>
+      <span>🧠 适合复习、自学与课堂辅助</span>
+      <span>✨ 导航页 · 轻量 · 清晰</span>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计算机基础知识百科全书</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #f6f1e7;
+            --bg-deep: #efe4d6;
+            --ink: #171717;
+            --muted: #5b5b5b;
+            --accent: #d3542c;
+            --accent-light: #ff8f5a;
+            --accent-dark: #b14320;
+            --teal: #1f6f78;
+            --card: #fff7ef;
+            --stroke: #e3d6c5;
+            --shadow: 0 18px 40px rgba(23, 23, 23, 0.12);
+            --radius-sm: 10px;
+            --radius-md: 12px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            --radius-2xl: 22px;
+            --space-1: 6px;
+            --space-2: 8px;
+            --space-3: 10px;
+            --space-4: 12px;
+            --space-5: 14px;
+            --space-6: 16px;
+            --space-7: 18px;
+            --space-8: 20px;
+            --space-9: 24px;
+            --space-10: 32px;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --error: #b54832;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background:
+                radial-gradient(240px 140px at 10% -10%, #ffd2b9 0%, transparent 70%),
+                radial-gradient(220px 160px at 90% 0%, #cfe7e6 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            padding: var(--space-10) var(--space-8);
+            box-sizing: border-box;
+            background: var(--card);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--stroke);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .progress-text {
+            color: var(--muted);
+            font-size: 0.9em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-correct { color: var(--teal); }
+        .status-wrong { color: var(--error); }
+
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-item:hover:not(.selected) {
+            background-color: var(--card);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .option-item.selected.correct {
+            background-color: rgba(31, 111, 120, 0.12);
+            border-color: var(--teal);
+        }
+
+        .option-item.selected.incorrect {
+            background-color: rgba(181, 72, 50, 0.12);
+            border-color: var(--error);
+        }
+
+        .option-item.revealed-correct {
+            border-color: rgba(31, 111, 120, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(31, 111, 120, 0.16);
+        }
+
+        .option-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-state {
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .selected .feedback-state {
+            display: block;
+        }
+
+        .revealed-correct .feedback-state {
+            display: block;
+        }
+
+        .correct .feedback-state { color: var(--teal); }
+        .incorrect .feedback-state { color: var(--error); }
+        .revealed-correct .feedback-state { color: var(--teal); }
+
+        .rationale {
+            font-size: 0.95em;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .selected .rationale {
+            display: block;
+        }
+
+        .revealed-correct .rationale {
+            display: block;
+        }
+        .hint-toggle {
+            border: 1px solid var(--stroke);
+            color: var(--muted);
+            cursor: pointer;
+            padding: var(--space-2) var(--space-6);
+            border-radius: var(--radius-md);
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hint-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .hint-content {
+            margin-top: 32px;
+            padding: var(--space-6);
+            background-color: #fff;
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius-lg);
+            font-size: 0.95em;
+            color: var(--muted);
+            display: none;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .hint-content.active {
+            display: flex;
+        }
+
+        .hint-icon-box {
+            color: var(--accent-dark);
+            font-size: 1.2em;
+            margin-top: -2px;
+        }
+
+        .navigation {
+            margin-top: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-7);
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-prev {
+            background-color: #fff;
+            color: var(--ink);
+            border-color: var(--stroke);
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn-next {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: #fff;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(23, 23, 23, 0.12);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .results-screen {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .results-title {
+            font-family: var(--font-display);
+            font-size: 2.1em;
+            margin: 0;
+        }
+
+        .results-subtitle {
+            color: var(--muted);
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .result-card {
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            background: #fff;
+            border: 1px solid var(--stroke);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .result-label {
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-family: var(--font-display);
+        }
+
+        .result-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            color: var(--muted);
+            font-size: 0.95em;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            border: 1px solid var(--stroke);
+            color: var(--ink);
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 900px) {
+            .quiz-container {
+                margin: var(--space-8);
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .quiz-container {
+                padding: var(--space-8) var(--space-6);
+            }
+
+            .question-text {
+                font-size: 1.3em;
+            }
+
+            .option-item {
+                padding: var(--space-4);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                margin: var(--space-6);
+                padding: var(--space-7) var(--space-5);
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: var(--space-4);
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .hint-toggle {
+                justify-content: space-between;
+            }
+
+            .results-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-content">
+            <!-- Dynamic Content -->
+        </div>
+        <div id="results-content" class="hidden"></div>
+
+        <div id="hint-box" class="hint-content">
+            <div class="hint-icon-box">💡</div>
+            <div id="hint-text"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="hint-toggle" class="hint-toggle">
+                <span>Hint</span>
+                <span id="hint-icon-arrow">▼</span>
+            </button>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-prev">Previous</button>
+                <button id="next-btn" class="btn btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [{"answerOptions":[{"isCorrect":false,"rationale":"这是生成零标志（ZF）的方法，而不是溢出标志。","text":"将所有输出位进行或非（NOR）运算"},{"isCorrect":false,"rationale":"仅观察进位输出不能准确判断补码运算的溢出，必须结合进位输入来判断结果符号的正确性。","text":"仅观察最高位的进位输出值"},{"isCorrect":true,"rationale":"对于带符号数的算术运算，溢出标志通过 $Cin\\_MSB$ 和 $Cout\\_MSB$ 的异或逻辑来判断结果是否超出了 4 位补码的表示范围。","text":"最高有效位的进位输入与进位输出进行异或（XOR）运算"},{"isCorrect":false,"rationale":"这适用于无符号数的进位判断，而 OF 标志在文中明确指出用于带符号补码运算。","text":"检查结果是否大于 $15$"}],"hint":"考虑算术运算中进位进入最高位和离开最高位的一致性。","question":"在 4 位算术逻辑单元（ALU）设计中，溢出标志（OF）通常是如何计算的？"},{"answerOptions":[{"isCorrect":false,"rationale":"D 触发器通常需要时钟或使能信号来控制数据的存储时机。","text":"不需要时钟信号控制"},{"isCorrect":true,"rationale":"通过在 S 和 R 输入之间加入反相器，D 触发器确保两个输入始终互补，从而避免了 SR 锁存器中 $S=0, R=0$（或 $S=1, R=1$）的非法状态。","text":"能够避免产生不确定的输入状态"},{"isCorrect":false,"rationale":"D 触发器的设计初衷是解决逻辑冲突和时序控制，而非单纯为了提升速度。","text":"处理速度快一倍"},{"isCorrect":false,"rationale":"单个 D 触发器本质上仍然是 1 位存储单元。","text":"可以存储多个位的数据"}],"hint":"回想一下 SR 锁存器中哪种输入组合会导致输出不稳定或非法。","question":"D 型触发器相比于基础的 SR 锁存器，其主要优势是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"这个数字与计算逻辑无关，可能是错误的乘法结果。","text":"$80$ 次"},{"isCorrect":false,"rationale":"$40$ 是每组样本的数量，而不是处理完所有样本所需的组数。","text":"$40$ 次"},{"isCorrect":false,"rationale":"这是 batch size 为 1 时的迭代次数。","text":"$2000$ 次"},{"isCorrect":true,"rationale":"迭代次数等于样本总数除以 batch size，即 $2000 / 40 = 50$。","text":"$50$ 次"}],"hint":"计算一个周期内需要处理多少组数据。","question":"在深度学习中，如果训练集的样本总数为 $2000$，且设置 batch size 为 $40$，那么完成一个 epoch 需要多少次迭代？"},{"answerOptions":[{"isCorrect":false,"rationale":"这些是计算机的发展趋势，不是基础工作原理。","text":"网络化和智能化"},{"isCorrect":false,"rationale":"这些是现代计算机的性能特征，而非体系结构的核心原理。","text":"高速运算和海量存储"},{"isCorrect":true,"rationale":"这是冯·诺依曼架构的精髓，即程序以二进制形式存储在内存中，由计算机自动执行。","text":"存储程序和程序控制"},{"isCorrect":false,"rationale":"虽然计算机使用二进制，但其核心工作原理侧重于程序的存储与执行流程。","text":"二进制运算和逻辑处理"}],"hint":"思考指令是如何被预先放置并被顺序调用的。","question":"冯·诺依曼计算机工作原理的核心是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"DMA 改变的是数据流控制方式，而非时钟频率。","text":"通过增加 CPU 的时钟频率来加速 I/O"},{"isCorrect":true,"rationale":"DMA 控制器接管了系统总线进行数据传输，使 CPU 无需介入每一个字节的传送，从而释放 CPU 算力。","text":"允许在数据传输期间 CPU 继续执行其他任务"},{"isCorrect":false,"rationale":"DMA 是一种硬件机制，无法消除软件逻辑错误。","text":"消除操作系统内核中的所有错误"},{"isCorrect":false,"rationale":"DMA 恰恰支持了异步的数据传输过程。","text":"强制 I/O 设备以同步模式运行"}],"hint":"考虑当硬件控制器负责搬运数据时，CPU 正在做什么。","question":"在 I/O 系统中，直接内存访问（DMA）如何提高系统的并发性？"},{"answerOptions":[{"isCorrect":true,"rationale":"MMIO 模式下，CPU 使用相同的指令（如 MOV）访问内存和 I/O 寄存器；而 PMIO 使用独立的地址空间。","text":"MMIO 将 I/O 设备与内存共享相同的地址空间"},{"isCorrect":false,"rationale":"PMIO 通常需要专门的指令，如 x86 架构中的 IN 和 OUT。","text":"PMIO 不需要任何硬件指令支持"},{"isCorrect":false,"rationale":"事实上，由于地址空间充足，MMIO 在 32 位和 64 位系统中更为常用。","text":"MMIO 仅适用于 16 位过时的处理器"},{"isCorrect":false,"rationale":"这种描述更符合 DMA 的特征，而不是 I/O 映射方式。","text":"PMIO 允许直接进行内存到内存的拷贝"}],"hint":"思考 CPU 访问外部设备时，地址总线是如何划分的。","question":"内存映射 I/O（MMIO）与端口映射 I/O（PMIO）的主要区别是什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"设计者发现单纯提升原生 SATA 速度成本过高，因此引入 PCIe 通道以获得更高的带宽。","text":"利用 PCI Express 总线突破 SATA 6 Gbit/s 的速度限制"},{"isCorrect":false,"rationale":"SATA Express 设计时特别强调了对旧有 SATA 数据线的向后兼容性。","text":"彻底取消对旧版 SATA 硬盘的支持"},{"isCorrect":false,"rationale":"接口标准的改变主要影响数据传输效率，对制造工艺成本影响有限。","text":"降低固态硬盘的生产成本"},{"isCorrect":false,"rationale":"SATA Express 仍然是有线总线接口。","text":"将所有外设统一为无线连接"}],"hint":"想想当 SSD 的速度超过 600 MB/s 时，传统的总线遇到了什么瓶颈。","question":"SATA Express 接口标准在 SATA 3.2 中引入的主要目的是什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"减法对应的选择代码是 011。","text":"减法（Subtraction）运算"},{"isCorrect":true,"rationale":"根据映射表，代码 101 对应逻辑运算中的 OR 操作。","text":"按位或（OR）运算"},{"isCorrect":false,"rationale":"加法对应的选择代码通常是 001。","text":"加法（Addition）运算"},{"isCorrect":false,"rationale":"AND 运算对应的选择代码是 110。","text":"按位与（AND）运算"}],"hint":"查询文中提供的‘选择代码与操作映射表’。","question":"在 4 位 ALU 中，若选择代码 $(S2, S1, S0)$ 为 $(1, 0, 1)$，执行的是什么操作？"},{"answerOptions":[{"isCorrect":false,"rationale":"二分频器利用反馈回路，只需要一个时钟输入信号。","text":"它需要两个独立的数据输入端"},{"isCorrect":true,"rationale":"通过将 Q 端反馈至 D 端，触发器每两个时钟周期完成一次完整的电平翻转，从而实现频率减半。","text":"输出频率是输入时钟频率的一半"},{"isCorrect":false,"rationale":"该电路的作用是改变信号频率，而不是定期清除存储数据。","text":"它每隔一个时钟周期就会清除内存"},{"isCorrect":false,"rationale":"这与分频的定义相反，分频是指降低频率。","text":"输入频率是输出频率的一半"}],"hint":"观察时钟脉冲与输出脉冲在相同时间内的个数比例。","question":"关于 D 触发器构成的“二分频器”（Divide-by-2 Counter），下列说法正确的是："},{"answerOptions":[{"isCorrect":true,"rationale":"过拟合意味着模型“记住了”训练数据的噪声和细节，而失去了对未知数据的泛化能力。","text":"过拟合（Overfitting）"},{"isCorrect":false,"rationale":"欠拟合是指模型在训练集和测试集上的表现都很差。","text":"欠拟合（Underfitting）"},{"isCorrect":false,"rationale":"这是一种解决过拟合的手段，而非现象本身。","text":"数据增强（Data Augmentation）"},{"isCorrect":false,"rationale":"这是一种优化训练过程的技术。","text":"批标准化（Batch Normalization）"}],"hint":"思考“死记硬背”对模型应用的影响。","question":"模型在训练集上准确率极高但在测试集上表现糟糕，这通常被称为："},{"answerOptions":[{"isCorrect":true,"rationale":"交互性是多媒体技术区别于传统媒介的关键，允许用户控制和参与内容展示。","text":"交互性"},{"isCorrect":false,"rationale":"集成性指多种媒体信息的综合处理。","text":"集成性"},{"isCorrect":false,"rationale":"多样性指处理信息类型的多样（文字、图像、声音等）。","text":"多样性"},{"isCorrect":false,"rationale":"实时性强调系统响应和播放的及时性。","text":"实时性"}],"hint":"寻找代表“沟通与互动”的词汇。","question":"在多媒体技术的主要特征中，哪一项强调了用户可以与系统进行双向的信息交流？"},{"answerOptions":[{"isCorrect":true,"rationale":"中断处理涉及保存上下文和分发任务的开销，若 I/O 完成极快，这些开销将超过简单的循环检查。","text":"当 I/O 操作非常频繁且持续时间极短时"},{"isCorrect":false,"rationale":"文中提到单个串行端口通常建议使用中断方式。","text":"当系统只有一个串行端口需要管理时"},{"isCorrect":false,"rationale":"对于慢速设备，轮询会浪费大量的 CPU 周期在无谓的等待上。","text":"当 I/O 设备非常缓慢（如打印机）时"},{"isCorrect":false,"rationale":"轮询会持续占用 CPU 资源进行检查，不利于休眠。","text":"当 CPU 需要长时间休眠以节省能源时"}],"hint":"考虑中断产生的管理开销与简单循环检查之间的成本对比。","question":"在 I/O 控制中，相比于中断驱动，轮询（Polling）在什么情况下可能更有效？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是 x86 启动过程中的特定操作，与内存屏障的功能无关。","text":"强制 CPU 切换到 16 位实模式"},{"isCorrect":false,"rationale":"屏障是软件层面的同步指令，无法检测物理电路故障。","text":"用于检测数据总线上的物理短路"},{"isCorrect":true,"rationale":"硬件寄存器的操作往往具有顺序依赖性，内存屏障强制执行写入顺序，防止优化引起的功能错误。","text":"防止缓存优化导致对硬件寄存器的写入顺序发生改变"},{"isCorrect":false,"rationale":"屏障与地址空间大小无关，与指令执行顺序有关。","text":"为了扩展 RAM 的物理寻址上限"}],"hint":"思考当写入指令被重新排列时，外部硬件是否还能接收到正确的指令序列。","question":"为什么在 MMIO 系统中，内存屏障（Memory Barriers）对程序正确性至关重要？"},{"answerOptions":[{"isCorrect":false,"rationale":"STREAMS 属于操作系统内核的 I/O 流控制架构，不是硬盘逻辑接口标准。","text":"STREAMS 驱动程序"},{"isCorrect":true,"rationale":"NVMe 专为低延迟和高并行度设计，拥有更深的命令队列，适合闪存介质。","text":"NVM Express (NVMe)"},{"isCorrect":false,"rationale":"这是更古老的标准，不支持 PCIe 的并行特性。","text":"Legacy IDE 模式"},{"isCorrect":false,"rationale":"AHCI 是为旋转磁盘设计的，在处理高速 PCIe SSD 时存在效率瓶颈。","text":"Advanced Host Controller Interface (AHCI)"}],"hint":"寻找一个现代的、专为闪存优化的标准。","question":"在 SATA Express 的逻辑接口选项中，哪一种能充分利用 PCIe 存储设备的并行处理能力？"},{"answerOptions":[{"isCorrect":false,"rationale":"这通常被称为一个“字”（word）的大小（在 16 位系统中）。","text":"$16$ 个"},{"isCorrect":false,"rationale":"这通常是 32 位系统中的一个字长。","text":"$32$ 个"},{"isCorrect":true,"rationale":"这是计算机基础知识中的标准定义。","text":"$8$ 个"},{"isCorrect":false,"rationale":"这是半个字节或一个“半字节”（nibble）的大小。","text":"$4$ 个"}],"hint":"这是度量存储容量的最基础单位转换。","question":"一个字节（Byte）在标准计算机定义中占据多少个二进制位（Bit）？"},{"answerOptions":[{"isCorrect":false,"rationale":"互换位置得到的是 $B - A$，不符合 $A - B$ 的逻辑。","text":"将 A 和 B 的位置互换"},{"isCorrect":false,"rationale":"进位标志在减法中对于判断借位非常重要，不能禁用。","text":"禁用进位输出标志以防止报错"},{"isCorrect":true,"rationale":"根据补码原理，$A - B = A + (\\sim B + 1)$，因此需要取反 B 并加 1。","text":"按位取反并将进位输入（Cin）设为 $1$"},{"isCorrect":false,"rationale":"这是执行递减（Decrement）操作的方法，而非通用的减法。","text":"直接将 B 设置为常数 $1111$"}],"hint":"利用补码计算减法的标准公式是什么？","question":"在 ALU 的减法运算 $S = A - B$ 实现中，当选择减法时，对 B 输入的处理通常是："},{"answerOptions":[{"isCorrect":false,"rationale":"触发器需要持续的时钟信号来同步操作。","text":"仅在电源开启的瞬间"},{"isCorrect":false,"rationale":"这是低电平敏感锁存器的特征。","text":"时钟信号保持在低电平的整个期间"},{"isCorrect":false,"rationale":"这是电平敏感锁存器的特征，而非主从触发器的特征。","text":"时钟信号保持在高电平的整个期间"},{"isCorrect":true,"rationale":"主从结构的设计目的就是通过级联锁存器实现边沿触发，从而消除电平触发的竞态条件。","text":"时钟脉冲的边沿（上升沿或下降沿）"}],"hint":"考虑“Master”和“Slave”阶段分别在脉冲的什么部分起作用。","question":"主从（Master-Slave）D 触发器通常在时钟信号的什么位置触发状态改变？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是第三代计算机的标志。","text":"中、小规模集成电路"},{"isCorrect":false,"rationale":"晶体管是第二代计算机的标志。","text":"晶体管"},{"isCorrect":true,"rationale":"从 1972 年至今，计算机技术基于极高集成度的电路。","text":"大规模或超大规模集成电路"},{"isCorrect":false,"rationale":"电子管是第一代计算机的标志。","text":"电子管"}],"hint":"现代计算机芯片的复杂程度极高，反映了哪种技术？","question":"在计算机的发展历程中，第四代计算机主要采用什么作为核心元器件？"},{"answerOptions":[{"isCorrect":false,"rationale":"这是设备管理的功能。","text":"连接打印机和扫描仪等外部设备"},{"isCorrect":false,"rationale":"这是文件管理的功能。","text":"整理硬盘驱动器上的文件目录"},{"isCorrect":false,"rationale":"这是存储器管理的功能。","text":"管理 RAM 中数据的物理布局"},{"isCorrect":true,"rationale":"处理机管理涉及进程调度和处理器分配。","text":"控制 CPU 的分配和执行流程"}],"hint":"“处理机”是计算机中执行指令的核心部件。","question":"操作系统的“处理机管理”功能主要负责什么？"},{"answerOptions":[{"isCorrect":true,"rationale":"通过这 1 个 bit 的开关状态，主机可以判断设备是否准备好接受新命令或是否已完成操作。","text":"忙碌状态（Busy bit）"},{"isCorrect":false,"rationale":"序列号信息远超过 1 bit 的承载能力。","text":"设备的物理序列号"},{"isCorrect":false,"rationale":"握手信号用于同步控制，数据传输由独立的数据线负责。","text":"传输的数据值"},{"isCorrect":false,"rationale":"优先级通常需要多个 bit 来区分不同的设备等级。","text":"中断优先级"}],"hint":"这个信号的作用是告诉主机：设备现在‘有空’还是‘在忙’。","question":"在 I/O 控制器的 handshaking（握手）协议中，如果只使用 1 个 bit，该 bit 通常代表什么？"},{"answerOptions":[{"isCorrect":false,"rationale":"地址解码方式对运算速度没有显著的线性加速作用。","text":"计算机的运行速度提升一倍"},{"isCorrect":false,"rationale":"解码方式无法改变物理内存的实际大小。","text":"RAM 容量自动扩充"},{"isCorrect":true,"rationale":"由于没有检查所有的地址线，多个地址组合可能指向同一个设备，产生所谓的“地址镜像”。","text":"一个硬件寄存器对应多个不同的内存地址"},{"isCorrect":false,"rationale":"不完全寻址仍能工作，只是会浪费地址空间。","text":"CPU 无法访问任何外部设备"}],"hint":"如果地址解码器忽略了一些特定的地址线，会发生什么？","question":"“不完全寻址（Partial Decoding）”在地址解码中可能导致什么现象？"},{"answerOptions":[{"isCorrect":true,"rationale":"SRIS 允许使用独立的参考时钟，减少了 PCIe 同步信号对线材电磁屏蔽的高要求。","text":"消除昂贵的屏蔽电缆需求"},{"isCorrect":false,"rationale":"这是操作系统的功能，不是接口物理层技术。","text":"将固态硬盘转换为虚拟内存"},{"isCorrect":false,"rationale":"坏道修复是硬盘控制器或文件系统的任务，不是时钟架构的功能。","text":"自动修复硬盘上的物理坏道"},{"isCorrect":false,"rationale":"文中提到的最高速度为 16 Gbit/s，且 SRIS 关注的是信号完整性。","text":"将 SATA 速度提升至 $32$ Gbit/s"}],"hint":"这项技术涉及到时钟信号的传输方式和成本优化。","question":"SATA Express 接口中，SRIS 技术的主要作用是："},{"answerOptions":[{"isCorrect":true,"rationale":"这是 Epoch 的标准定义，即所有训练样本都参加了一次训练。","text":"一个 Epoch"},{"isCorrect":false,"rationale":"泛化是训练的目标结果，不是指训练过程的计数单位。","text":"模型泛化"},{"isCorrect":false,"rationale":"Dropout 是训练中的正则化技术，随机丢弃神经元。","text":"一次 Dropout"},{"isCorrect":false,"rationale":"Batch 是指数据中的一小组样本。","text":"一次 Batch"}],"hint":"就像读完了一整本书的一次迭代。","question":"在深度学习中，如果模型把整个训练数据完整学习一遍，这被称为："},{"answerOptions":[{"isCorrect":false,"rationale":"反相器只能处理单个输入，无法处理 4 位结果总线。","text":"反相器（NOT）"},{"isCorrect":false,"rationale":"XOR 门用于检测位的不一致性，不适合直接检测全零。","text":"异或门（XOR）"},{"isCorrect":false,"rationale":"只有当所有输入位均为 1 时，AND 门的输出才为 1。","text":"四输入与门（AND）"},{"isCorrect":true,"rationale":"只有当所有输入位均为 0 时，NOR 门的输出才为 1，这完全符合 ZF 标志的逻辑要求。","text":"四输入或非门（NOR）"}],"hint":"寻找一种门电路，在输入全部为‘0’时输出‘1’。","question":"4 位 ALU 的“零标志（ZF）”通常使用什么逻辑门实现最为直接？"},{"answerOptions":[{"isCorrect":true,"rationale":"这种设计实现了机械上的向后兼容，允许插入标准 SATA 数据线。","text":"它通过“堆叠”两个标准 SATA 连接器并增加一个额外连接器构成"},{"isCorrect":false,"rationale":"SATA Express 连接器是长方形的扁平接口。","text":"它采用圆形的 9 针连接器以提高稳定性"},{"isCorrect":false,"rationale":"由于集成了 PCIe 和 SATA 通道，其接口长度实际上比标准 SATA 更长。","text":"它的长度只有标准 SATA 接口的一半"},{"isCorrect":false,"rationale":"它仍然需要物理线缆进行数据传输。","text":"它完全放弃了物理连线，仅通过电磁感应传输"}],"hint":"考虑它是如何实现在同一个接口上既能插新设备又能插旧设备的。","question":"关于 SATA Express 接口的物理结构，下列描述正确的是："},{"answerOptions":[{"isCorrect":true,"rationale":"操作码指示做什么操作，地址码指示数据在哪里。","text":"操作码和地址码"},{"isCorrect":false,"rationale":"这些是数据传输的安全和纠错机制，不是指令的基本构成。","text":"加密位和校验位"},{"isCorrect":false,"rationale":"指令在底层全部由二进制数码组成，不区分文字码。","text":"数字码和文字码"},{"isCorrect":false,"rationale":"指令本身描述动作，输入输出是动作的类别。","text":"输入码和输出码"}],"hint":"思考指令需要说明‘做什么’以及‘对谁做’。","question":"指令是计算机执行某种操作的命令，它通常由哪两部分组成？"},{"answerOptions":[{"isCorrect":false,"rationale":"最后一位由于两个输入都是 0，结果应当是 0。","text":"$1111$"},{"isCorrect":false,"rationale":"这是按位与（AND）运算的结果。","text":"$1000$"},{"isCorrect":true,"rationale":"$1100 \\text{ OR } 1010 = 1110$（逐位比较：$1|1=1, 1|0=1, 0|1=1, 0|0=0$）。","text":"$1110$"},{"isCorrect":false,"rationale":"这是按位异或（XOR）运算的结果。","text":"$0110$"}],"hint":"执行逐位的逻辑‘或’运算。","question":"在 4 位 ALU 中执行 OR 操作时，若 $A = 1100$ 且 $B = 1010$，则结果 S 为："},{"answerOptions":[{"isCorrect":false,"rationale":"输出会有一定的延迟，不可能领先于输入。","text":"$Q$ 的变化总是领先于 $D$ 的变化"},{"isCorrect":false,"rationale":"输出状态取决于输入数据，$D$ 代表数据（Data）。","text":"$Q$ 的值与 $D$ 无关，只受时钟频率控制"},{"isCorrect":false,"rationale":"只有补码输出端 $\\bar{Q}$ 才是 $D$ 的反相。","text":"$Q$ 始终是 $D$ 的反相值"},{"isCorrect":true,"rationale":"这是“数据锁存”的基本特征，即在控制信号允许时将输入状态传递至输出并锁定。","text":"在时钟激活时，$Q$ 会复制并保持 $D$ 的逻辑水平"}],"hint":"D 代表‘Data’或‘Delay’，这意味着它对输入数据的处理方式。","question":"D 触发器的输出信号 $Q$ 与输入数据 $D$ 之间的关系可以描述为："}];
+        let currentIndex = 0;
+        let mode = 'quiz';
+        let state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+
+        function getStats() {
+            const answered = state.filter((s) => s.selectedIndex !== null).length;
+            const correct = state.filter((s, i) => s.selectedIndex !== null && quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const wrong = state.filter((s, i) => s.selectedIndex !== null && !quizData[i].answerOptions[s.selectedIndex].isCorrect).length;
+            const skipped = quizData.length - answered;
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            return { answered, correct, wrong, skipped, accuracy };
+        }
+
+        function shuffleAnswers() {
+            quizData.forEach((q) => {
+                for (let i = q.answerOptions.length - 1; i > 0; i -= 1) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.answerOptions[i], q.answerOptions[j]] = [q.answerOptions[j], q.answerOptions[i]];
+                }
+            });
+        }
+
+        function shuffleQuestions() {
+            for (let i = quizData.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
+            }
+        }
+
+        function resetState() {
+            state = quizData.map(() => ({ selectedIndex: null, hintVisible: false }));
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentIndex];
+            const s = state[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            let optionsHtml = '';
+            const correctIndex = q.answerOptions.findIndex((o) => o.isCorrect);
+            const selectedCorrect = s.selectedIndex !== null && q.answerOptions[s.selectedIndex].isCorrect;
+            q.answerOptions.forEach((opt, idx) => {
+                const isSelected = s.selectedIndex === idx;
+                const statusClass = isSelected ? (opt.isCorrect ? 'correct' : 'incorrect') : '';
+                const selectedClass = isSelected ? 'selected' : '';
+                const revealCorrect = (s.selectedIndex !== null && !selectedCorrect && opt.isCorrect) || (mode === 'review' && opt.isCorrect);
+                const revealClass = revealCorrect ? 'revealed-correct' : '';
+
+                optionsHtml += `
+                    <li class="option-item ${selectedClass} ${statusClass} ${revealClass}" onclick="selectOption(${idx})">
+                        <div class="option-label">
+                            <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                        </div>
+                        <div class="feedback-state">
+                            ${opt.isCorrect ? '✓ Right answer' : '✕ Not quite'}
+                        </div>
+                        ${opt.rationale ? '<div class="rationale">' + opt.rationale + '</div>' : ''}
+                    </li>
+                `;
+            });
+
+            const stats = getStats();
+
+            content.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-text">${currentIndex + 1} / ${quizData.length}</div>
+                    <div class="status-bar">
+                        <div class="status-item status-correct">
+                            <span>✓</span>
+                            <span>${stats.correct}</span>
+                        </div>
+                        <div class="status-item status-wrong">
+                            <span>✕</span>
+                            <span>${stats.wrong}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="question-text">${q.question}</div>
+                <ul class="options-list">
+                    ${optionsHtml}
+                </ul>
+            `;
+
+            // Update Hint Box
+            const hintText = document.getElementById('hint-text');
+            hintText.innerText = q.hint || 'No hint available for this question.';
+            if (s.hintVisible) {
+                hintBox.classList.add('active');
+            } else {
+                hintBox.classList.remove('active');
+            }
+
+            results.classList.add('hidden');
+            content.classList.remove('hidden');
+            hintBox.classList.remove('hidden');
+            nav.classList.remove('hidden');
+
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = false;
+            if (mode === 'review') {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Back to Results' : 'Next';
+            } else {
+                nextBtn.innerText = currentIndex === quizData.length - 1 ? 'Finish' : 'Next';
+            }
+            document.getElementById('hint-icon-arrow').innerText = s.hintVisible ? '▲' : '▼';
+        }
+
+        function selectOption(idx) {
+            if (mode !== 'quiz') return;
+            if (state[currentIndex].selectedIndex !== null) return; // Prevent re-selection
+            state[currentIndex].selectedIndex = idx;
+            renderQuestion();
+        }
+
+        function toggleHint() {
+            if (mode === 'results') return;
+            state[currentIndex].hintVisible = !state[currentIndex].hintVisible;
+            renderQuestion();
+        }
+
+        function renderResults() {
+            const stats = getStats();
+            const content = document.getElementById('quiz-content');
+            const results = document.getElementById('results-content');
+            const hintBox = document.getElementById('hint-box');
+            const nav = document.querySelector('.navigation');
+
+            const score = `${stats.correct} / ${quizData.length}`;
+
+            results.innerHTML = `
+                <div class="results-screen">
+                    <div>
+                        <h1 class="results-title">You did it! Quiz Complete.</h1>
+                        <p class="results-subtitle">Review your score or take another run.</p>
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <div class="result-label">Score</div>
+                            <div class="result-value">${score}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">Accuracy</div>
+                            <div class="result-value">${stats.accuracy}%</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-metrics">
+                                <div>Right <strong>${stats.correct}</strong></div>
+                                <div>Wrong <strong>${stats.wrong}</strong></div>
+                                <div>Skipped <strong>${stats.skipped}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="review-btn" class="btn btn-ghost">Review Quiz</button>
+                        <button id="retake-btn" class="btn btn-next">Retake Quiz</button>
+                    </div>
+                </div>
+            `;
+
+            content.classList.add('hidden');
+            results.classList.remove('hidden');
+            hintBox.classList.add('hidden');
+            nav.classList.add('hidden');
+
+            document.getElementById('review-btn').onclick = () => {
+                mode = 'review';
+                currentIndex = 0;
+                renderQuestion();
+            };
+
+            document.getElementById('retake-btn').onclick = () => {
+                mode = 'quiz';
+                currentIndex = 0;
+                shuffleQuestions();
+                shuffleAnswers();
+                resetState();
+                renderQuestion();
+            };
+        }
+
+        document.getElementById('prev-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestion();
+            }
+        };
+
+        document.getElementById('next-btn').onclick = () => {
+            if (mode === 'results') return;
+            if (mode === 'review') {
+                if (currentIndex < quizData.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                } else {
+                    mode = 'results';
+                    renderResults();
+                }
+                return;
+            }
+            if (currentIndex < quizData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                mode = 'results';
+                renderResults();
+            }
+        };
+
+        document.getElementById('hint-toggle').onclick = toggleHint;
+
+        renderQuestion();
+    </script>
+</body>
+</html>
